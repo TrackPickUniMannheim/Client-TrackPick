@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "de.unima.ar.collector"
+        minSdkVersion 20
+        targetSdkVersion 24
+        versionCode 20
+        versionName "1.5.19"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.google.android.support:wearable:1.0.0'
+    compile 'com.google.android.gms:play-services-wearable:9.2.1'
+    compile project(':shared')
+}

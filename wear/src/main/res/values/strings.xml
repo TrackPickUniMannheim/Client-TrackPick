@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sensor Data Collector</string>
+    <string name="app_toast_running">The app is still running and collecting &#8230;</string>
+    <string name="app_toast_destroy">"Sensor Wearable App destroyed!"</string>
+    <string name="service_name">SensorService</string>
+
+    <string name="welcome_info">Collector started!</string>
+    <string name="welcome_info2">(Touch to select an activity)</string>
+    <string name="welcome_button_continue_description">Continue Button to switch to the main view</string>
+    <string name="welcome_long_press_exit">X</string>
+
+    <string name="posture_info">Current Activity</string>
+    <string name="posture_setting_button_description">Settings Button that switch to a new activity</string>
+    <string name="activity_selector_button_description">Activity Selector Button</string>
+    <string name="posture_headline">Posture</string>
+    <string name="position_headline">Position</string>
+    <string name="activity_headline">Activity</string>
+    <string name="activity_general_loading">loading&#8230;</string>
+    <string name="activity_general_notspecified">Not Specified</string>
+    <string name="activity_general_activities">Activities</string>
+
+    <string name="broadcast_outofrange">Warning! Smartphone out of Range!</string>
+    <string name="sending_error">Warning! Data could not be transferred. Try again&#8230;</string>
+    <string name="sending_force">Stopping Sensors! Force data transfer to handheld.</string>
+
+    <string name="database_delete">Database deleted!</string>
+
+    <string name="preferences_directtransfer_enabled">\'Transfer immediately\' activated</string>
+    <string name="preferences_directtransfer_disabled">\'Transfer immediately\' deactivated</string>
+    <string name="preferences_sensors_enabled">\'Sensor recordning\' activated</string>
+    <string name="preferences_sensors_disabled">\'Sensor recordning\' deactivated</string>
+</resources>
