@@ -1,6 +1,7 @@
 package de.unima.ar.collector.sensors;
 
 import android.content.ContentValues;
+import android.os.AsyncTask;
 import android.hardware.Sensor;
 
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.unima.ar.collector.TCPClient;
 import de.unima.ar.collector.SensorDataCollectorService;
 import de.unima.ar.collector.controller.SQLDBController;
 import de.unima.ar.collector.database.DatabaseHelper;
@@ -17,7 +19,6 @@ import de.unima.ar.collector.shared.database.SQLTableName;
 import de.unima.ar.collector.shared.util.DeviceID;
 import de.unima.ar.collector.util.DBUtils;
 import de.unima.ar.collector.util.PlotConfiguration;
-
 
 /**
  * @author Fabian Kramm, Timo Sztyler
@@ -30,6 +31,9 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     private static Map<String, Plotter>        plotters = new HashMap<>();
     private static Map<String, List<String[]>> cache    = new HashMap<>();
+
+    private static TCPClient mTcpClient;
+
 
 
     public AccelerometerSensorCollector(Sensor sensor)
@@ -143,11 +147,16 @@ public class AccelerometerSensorCollector extends SensorCollector
     {
         String sqlTable = "CREATE TABLE IF NOT EXISTS " + SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER + " (id INTEGER PRIMARY KEY, " + valueNames[3] + " INTEGER, " + valueNames[0] + " REAL, " + valueNames[1] + " REAL, " + valueNames[2] + " REAL)";
         SQLDBController.getInstance().execSQL(sqlTable);
-    }
 
+        // connect to the server
+        new AccelerometerSensorCollector.connectTask().execute("");
+    }
 
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
+        mTcpClient.sendMessage(deviceID + " Accelerometer: " + newValues.toString());
+
+
         String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER;
 
         if(Settings.DATABASE_DIRECT_INSERT) {
@@ -164,6 +173,22 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void flushDBCache(String deviceID)
     {
+        mTcpClient.sendMessage(deviceID + " Accelerometer: flushDBCache: " + cache.toString());
+
+
         DBUtils.flushCache(SQLTableName.ACCELEROMETER, cache, deviceID);
+    }
+
+    public static class connectTask extends AsyncTask<String,String,TCPClient> {
+
+        @Override
+        protected TCPClient doInBackground(String... message) {
+
+            mTcpClient = new TCPClient();
+            mTcpClient.run();
+
+            return null;
+        }
+
     }
 }
