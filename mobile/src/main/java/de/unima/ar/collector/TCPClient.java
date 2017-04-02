@@ -1,5 +1,5 @@
 package de.unima.ar.collector; /**
- * Created by D060345 on 29.03.2017.
+ * Created by Nancy Kunath on 29.03.2017.
  */
 import android.util.Log;
 import java.io.*;

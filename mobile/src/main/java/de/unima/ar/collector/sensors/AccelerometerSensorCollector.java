@@ -145,28 +145,21 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void createDBStorage(String deviceID)
     {
-        String sqlTable = "CREATE TABLE IF NOT EXISTS " + SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER + " (id INTEGER PRIMARY KEY, " + valueNames[3] + " INTEGER, " + valueNames[0] + " REAL, " + valueNames[1] + " REAL, " + valueNames[2] + " REAL)";
-        SQLDBController.getInstance().execSQL(sqlTable);
-
         // connect to the server
         new AccelerometerSensorCollector.connectTask().execute("");
     }
 
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
-        mTcpClient.sendMessage(deviceID + " Accelerometer: " + newValues.toString());
-
-
-        String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER;
 
         if(Settings.DATABASE_DIRECT_INSERT) {
-            SQLDBController.getInstance().insert(tableName, null, newValues);
+            mTcpClient.sendMessage(deviceID + " Accelerometer: " + newValues.toString());
             return;
         }
 
         List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
         if(clone != null) {
-            SQLDBController.getInstance().bulkInsert(tableName, clone);
+            //SQLDBController.getInstance().bulkInsert(tableName, clone);
         }
     }
 
@@ -176,7 +169,7 @@ public class AccelerometerSensorCollector extends SensorCollector
         mTcpClient.sendMessage(deviceID + " Accelerometer: flushDBCache: " + cache.toString());
 
 
-        DBUtils.flushCache(SQLTableName.ACCELEROMETER, cache, deviceID);
+        //DBUtils.flushCache(SQLTableName.ACCELEROMETER, cache, deviceID);
     }
 
     public static class connectTask extends AsyncTask<String,String,TCPClient> {
