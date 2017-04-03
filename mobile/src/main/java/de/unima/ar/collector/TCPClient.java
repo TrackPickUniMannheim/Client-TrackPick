@@ -10,7 +10,7 @@ public class TCPClient {
 
     public static final String SERVER_IP = "10.0.2.2"; //later Server's IP Adress
     //public static final String SERVER_IP = "127.0.0.1"; //later Server's IP Adress
-    public static final int SERVER_PORT = 4444;
+    public static final int SERVER_PORT = 9999;
     private String mServerMessage;
     private boolean mRun = false;
     private PrintWriter mBufferOut;

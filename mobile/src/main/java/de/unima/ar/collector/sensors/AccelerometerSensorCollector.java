@@ -21,7 +21,7 @@ import de.unima.ar.collector.util.DBUtils;
 import de.unima.ar.collector.util.PlotConfiguration;
 
 /**
- * @author Fabian Kramm, Timo Sztyler
+ * @author Fabian Kramm, Timo Sztyler, Nancy Kunath
  */
 public class AccelerometerSensorCollector extends SensorCollector
 {

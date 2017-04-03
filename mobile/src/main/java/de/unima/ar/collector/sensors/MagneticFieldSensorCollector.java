@@ -3,6 +3,7 @@ package de.unima.ar.collector.sensors;
 import android.content.ContentValues;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.unima.ar.collector.SensorDataCollectorService;
+import de.unima.ar.collector.TCPClient;
 import de.unima.ar.collector.controller.SQLDBController;
 import de.unima.ar.collector.database.DatabaseHelper;
 import de.unima.ar.collector.extended.Plotter;
@@ -21,7 +23,7 @@ import de.unima.ar.collector.util.PlotConfiguration;
 
 
 /**
- * @author Fabian Kramm, Timo Sztyler
+ * @author Fabian Kramm, Timo Sztyler, Nancy Kunath
  */
 public class MagneticFieldSensorCollector extends SensorCollector
 {
@@ -30,6 +32,8 @@ public class MagneticFieldSensorCollector extends SensorCollector
 
     private static Map<String, Plotter>        plotters = new HashMap<>();
     private static Map<String, List<String[]>> cache    = new HashMap<>();
+
+    private static TCPClient mTcpClient;
 
 
     public MagneticFieldSensorCollector(Sensor sensor)
@@ -127,29 +131,43 @@ public class MagneticFieldSensorCollector extends SensorCollector
 
     public static void createDBStorage(String deviceID)
     {
-        String sqlTable = "CREATE TABLE IF NOT EXISTS " + SQLTableName.PREFIX + deviceID + SQLTableName.MAGNETIC + " (id INTEGER PRIMARY KEY, " + valueNames[3] + " INTEGER, " + valueNames[0] + " REAL, " + valueNames[1] + " REAL, " + valueNames[2] + " REAL)";
-        SQLDBController.getInstance().execSQL(sqlTable);
+        // connect to the server
+        new MagneticFieldSensorCollector.connectTask().execute("");
     }
 
 
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
-        String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.MAGNETIC;
-
         if(Settings.DATABASE_DIRECT_INSERT) {
-            SQLDBController.getInstance().insert(tableName, null, newValues);
+            mTcpClient.sendMessage(deviceID + " Magnetic Field: " + newValues.toString());
             return;
         }
 
         List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
         if(clone != null) {
-            SQLDBController.getInstance().bulkInsert(tableName, clone);
+            //SQLDBController.getInstance().bulkInsert(tableName, clone);
         }
     }
 
 
     public static void flushDBCache(String deviceID)
     {
-        DBUtils.flushCache(SQLTableName.MAGNETIC, cache, deviceID);
+        mTcpClient.sendMessage(deviceID + " Magnetic Field: flushDBCache: " + cache.toString());
+
+
+        //DBUtils.flushCache(SQLTableName.MAGNETIC, cache, deviceID);
+    }
+
+    public static class connectTask extends AsyncTask<String,String,TCPClient> {
+
+        @Override
+        protected TCPClient doInBackground(String... message) {
+
+            mTcpClient = new TCPClient();
+            mTcpClient.run();
+
+            return null;
+        }
+
     }
 }
