@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -132,13 +133,17 @@ public class MagneticFieldSensorCollector extends SensorCollector
     public static void createDBStorage(String deviceID)
     {
         // connect to the server
-        new MagneticFieldSensorCollector.connectTask().execute("");
+        Log.i("Magnetic Field","createDBStorage");
+        ConnectTask task = new ConnectTask();
+
+        //task.execute("");
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
-        if(Settings.DATABASE_DIRECT_INSERT) {
+        if(Settings.DATABASE_DIRECT_INSERT && mTcpClient!=null) {
             mTcpClient.sendMessage(deviceID + " Magnetic Field: " + newValues.toString());
             return;
         }
@@ -158,7 +163,7 @@ public class MagneticFieldSensorCollector extends SensorCollector
         //DBUtils.flushCache(SQLTableName.MAGNETIC, cache, deviceID);
     }
 
-    public static class connectTask extends AsyncTask<String,String,TCPClient> {
+    private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
 
         @Override
         protected TCPClient doInBackground(String... message) {

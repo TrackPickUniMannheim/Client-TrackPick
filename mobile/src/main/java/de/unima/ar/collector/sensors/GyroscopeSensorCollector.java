@@ -3,6 +3,7 @@ package de.unima.ar.collector.sensors;
 import android.content.ContentValues;
 import android.hardware.Sensor;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -130,13 +131,17 @@ public class GyroscopeSensorCollector extends SensorCollector
     public static void createDBStorage(String deviceID)
     {
         // connect to the server
-        new GyroscopeSensorCollector.connectTask().execute("");
+        Log.i("Gyroscope","createDBStorage");
+        ConnectTask task = new ConnectTask();
+
+        //task.execute("");
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
-        if(Settings.DATABASE_DIRECT_INSERT) {
+        if(Settings.DATABASE_DIRECT_INSERT && mTcpClient!=null) {
             mTcpClient.sendMessage(deviceID + " Gyroscope: " + newValues.toString());
             return;
         }
@@ -156,7 +161,7 @@ public class GyroscopeSensorCollector extends SensorCollector
         //DBUtils.flushCache(SQLTableName.GYROSCOPE, cache, deviceID);
     }
 
-    public static class connectTask extends AsyncTask<String,String,TCPClient> {
+    private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
 
         @Override
         protected TCPClient doInBackground(String... message) {

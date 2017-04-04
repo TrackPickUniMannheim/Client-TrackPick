@@ -16,7 +16,9 @@ public class TCPClient {
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
 
-    public TCPClient() { }
+    public TCPClient() {
+        Log.i("TCP Client","New TCP Client");
+    }
 
     public void sendMessage(String message) {
         if (mBufferOut != null && !mBufferOut.checkError()) {
@@ -47,13 +49,13 @@ public class TCPClient {
 
         try {
             InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-            Log.e("TCP Client",serverAddr.toString());
-            Log.e("TCP Client", "C: Connecting...");
+            Log.i("TCP Client",serverAddr.toString());
+            Log.i("TCP Client", "C: Connecting...");
 
             //create a socket to make the connection with the server
             Socket socket = new Socket(serverAddr, SERVER_PORT);
 
-            Log.e("TCP Client",socket.toString());
+            Log.i("TCP Client",socket.toString());
 
             try {
 

@@ -3,6 +3,7 @@ package de.unima.ar.collector.sensors;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.hardware.Sensor;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -146,13 +147,17 @@ public class AccelerometerSensorCollector extends SensorCollector
     public static void createDBStorage(String deviceID)
     {
         // connect to the server
-        new AccelerometerSensorCollector.connectTask().execute("");
+        Log.i("Accelerometer","createDBStorage");
+        ConnectTask task = new ConnectTask();
+
+        //task.execute("");
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
 
-        if(Settings.DATABASE_DIRECT_INSERT) {
+        if(Settings.DATABASE_DIRECT_INSERT && mTcpClient!=null) {
             mTcpClient.sendMessage(deviceID + " Accelerometer: " + newValues.toString());
             return;
         }
@@ -172,7 +177,7 @@ public class AccelerometerSensorCollector extends SensorCollector
         //DBUtils.flushCache(SQLTableName.ACCELEROMETER, cache, deviceID);
     }
 
-    public static class connectTask extends AsyncTask<String,String,TCPClient> {
+    private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
 
         @Override
         protected TCPClient doInBackground(String... message) {
