@@ -1,5 +1,5 @@
 package de.unima.ar.collector; /**
- * Created by D060345 on 29.03.2017.
+ * Created by Nancy Kunath on 29.03.2017.
  */
 import android.util.Log;
 import java.io.*;
@@ -10,13 +10,15 @@ public class TCPClient {
 
     public static final String SERVER_IP = "10.0.2.2"; //later Server's IP Adress
     //public static final String SERVER_IP = "127.0.0.1"; //later Server's IP Adress
-    public static final int SERVER_PORT = 4444;
+    public static final int SERVER_PORT = 9999;
     private String mServerMessage;
     private boolean mRun = false;
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
 
-    public TCPClient() { }
+    public TCPClient() {
+        Log.i("TCP Client","New TCP Client");
+    }
 
     public void sendMessage(String message) {
         if (mBufferOut != null && !mBufferOut.checkError()) {
@@ -47,13 +49,13 @@ public class TCPClient {
 
         try {
             InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-            Log.e("TCP Client",serverAddr.toString());
-            Log.e("TCP Client", "C: Connecting...");
+            Log.i("TCP Client",serverAddr.toString());
+            Log.i("TCP Client", "C: Connecting...");
 
             //create a socket to make the connection with the server
             Socket socket = new Socket(serverAddr, SERVER_PORT);
 
-            Log.e("TCP Client",socket.toString());
+            Log.i("TCP Client",socket.toString());
 
             try {
 
