@@ -1100,6 +1100,7 @@ public class MainActivity extends AppCompatActivity
 
     public void showSensorenDetail()
     {
+        final String deviceID = DeviceID.get(this);
         addScreen(Screens.SENSOREN_DETAILS);
         setContentView(R.layout.activity_main);
 
@@ -1179,7 +1180,8 @@ public class MainActivity extends AppCompatActivity
                                 public void run()
                                 {
                                     Utils.makeToast2(MainActivity.this, R.string.sensor_cache_to_database, Toast.LENGTH_LONG);
-                                    SensorDataUtil.flushSensorDataCache(sensorID, null);
+                                    //SensorDataUtil.flushSensorDataCache(sensorID, null);
+                                    SensorDataUtil.closeSocket(sensorID, deviceID);
                                 }
                             }).start();
                         }
@@ -1192,6 +1194,7 @@ public class MainActivity extends AppCompatActivity
                             }
                             DBUtils.updateSensorStatus(sensorID, (1000 * 1000) / sc.getSensorRate(), 1); // microseconds -> hertz
                             service.getSCM().registerSensorCollector(sensorID);
+                            SensorDataUtil.openSocket(sensorID, deviceID);
                             chBx.setChecked(true);
                         }
                     }

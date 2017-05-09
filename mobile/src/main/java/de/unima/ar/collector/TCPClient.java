@@ -9,7 +9,7 @@ import java.net.Socket;
 public class TCPClient {
 
     public static final String SERVER_IP = "10.0.2.2"; //later Server's IP Adress
-    //public static final String SERVER_IP = "127.0.0.1"; //later Server's IP Adress
+    //public static final String SERVER_IP = "192.168.43.220"; //later Server's IP Adress
     public static final int SERVER_PORT = 9999;
     private String mServerMessage;
     private boolean mRun = false;
@@ -17,7 +17,11 @@ public class TCPClient {
     private BufferedReader mBufferIn;
 
     public TCPClient() {
-        Log.i("TCP Client","New TCP Client");
+
+    }
+
+    public boolean getMRun(){
+        return mRun;
     }
 
     public void sendMessage(String message) {
@@ -27,9 +31,9 @@ public class TCPClient {
         }
     }
 
-    public void stopClient() {
+    public void stopClient(String prefix) {
 
-        sendMessage("Close");
+        sendMessage(prefix + "Closed Connection");
 
         mRun = false;
 

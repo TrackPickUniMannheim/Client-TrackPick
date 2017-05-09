@@ -36,7 +36,6 @@ public class AccelerometerSensorCollector extends SensorCollector
     private static TCPClient mTcpClient;
 
 
-
     public AccelerometerSensorCollector(Sensor sensor)
     {
         super(sensor);
@@ -146,35 +145,39 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void createDBStorage(String deviceID)
     {
-        // connect to the server
-        Log.i("Accelerometer","createDBStorage");
-        ConnectTask task = new ConnectTask();
 
-        //task.execute("");
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
-
-        if(Settings.DATABASE_DIRECT_INSERT && mTcpClient!=null) {
-            mTcpClient.sendMessage(deviceID + " Accelerometer: " + newValues.toString());
+        if(Settings.DATABASE_DIRECT_INSERT) {
+            if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+                mTcpClient.sendMessage(deviceID + " Accelerometer: " + newValues.toString());
+            }
             return;
+        } else {
+            /*List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
+            if(clone != null) {
+                //SQLDBController.getInstance().bulkInsert(tableName, clone);
+            }*/
         }
 
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
-        if(clone != null) {
-            //SQLDBController.getInstance().bulkInsert(tableName, clone);
-        }
     }
-
 
     public static void flushDBCache(String deviceID)
     {
-        mTcpClient.sendMessage(deviceID + " Accelerometer: flushDBCache: " + cache.toString());
 
+    }
 
-        //DBUtils.flushCache(SQLTableName.ACCELEROMETER, cache, deviceID);
+    public static void openSocket(String deviceID){
+        // connect to the server
+        ConnectTask task = new ConnectTask();
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public static void closeSocket(String deviceID){
+        // disconnect to the server
+        mTcpClient.stopClient(deviceID + " Accelerometer: ");
     }
 
     private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
