@@ -34,6 +34,7 @@
     <string name="device_localdevice">Lokales Gerät</string>
 
     <!-- Sensor/Collector Management -->
+    <string name="sensor_disabled">Sensor deaktiviert!</string>
     <string name="sensor_selftest_title">Sensoren-Selbsttest</string>
     <string name="sensor_selftest_notify1">Der Sensor muss gestopped werden, bevor der Selbsttest gestartet wird!</string>
     <string name="sensor_selftest_notify2">Test nicht implementiert!</string>

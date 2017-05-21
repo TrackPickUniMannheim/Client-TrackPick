@@ -295,13 +295,13 @@ class Tasks
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
                     AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
-                AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
+                AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
                 break;
             case 2:
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
                     MagneticFieldSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
-                MagneticFieldSensorCollector.writeDBStorage(deviceID, newValues);
+                MagneticFieldSensorCollector.writeSensorData(deviceID, newValues);
                 break;
             case 3:
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
@@ -313,7 +313,7 @@ class Tasks
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
                     GyroscopeSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
-                GyroscopeSensorCollector.writeDBStorage(deviceID, newValues);
+                GyroscopeSensorCollector.writeSensorData(deviceID, newValues);
                 break;
             case 6:
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
