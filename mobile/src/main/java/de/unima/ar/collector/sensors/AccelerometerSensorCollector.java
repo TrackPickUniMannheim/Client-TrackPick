@@ -5,6 +5,10 @@ import android.os.AsyncTask;
 import android.hardware.Sensor;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +83,7 @@ public class AccelerometerSensorCollector extends SensorCollector
         newValues.put(valueNames[3], time);
 
         String deviceID = DeviceID.get(SensorDataCollectorService.getInstance());
-        AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
+        AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
         AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ x, y, z });
     }
 
@@ -142,24 +146,53 @@ public class AccelerometerSensorCollector extends SensorCollector
         plotter.setDynamicPlotData(values);
     }
 
-
-    public static void createDBStorage(String deviceID)
-    {
-
-    }
-
-    public static void writeDBStorage(String deviceID, ContentValues newValues)
+    public static void writeSensorData(String deviceID, ContentValues newValues)
     {
         if(Settings.DATABASE_DIRECT_INSERT) {
             if(mTcpClient!=null && mTcpClient.getMRun() != false) {
-                mTcpClient.sendMessage(deviceID + " Accelerometer: " + newValues.toString());
+                JSONObject ObJson = new JSONObject();
+                try {
+                    ObJson.put("deviceID",deviceID);
+                    ObJson.put("sensorType","accelerometer");
+                    JSONArray array = new JSONArray();
+                    JSONObject values = new JSONObject();
+                    values.put("timeStamp", newValues.getAsString("attr_time"));
+                    values.put("x", newValues.getAsString("attr_x"));
+                    values.put("y", newValues.getAsString("attr_y"));
+                    values.put("z", newValues.getAsString("attr_z"));
+                    array.put(values);
+                    ObJson.put("data",array);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mTcpClient.sendMessage(ObJson.toString());
             }
             return;
         } else {
-            /*List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
+            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 2));
             if(clone != null) {
-                //SQLDBController.getInstance().bulkInsert(tableName, clone);
-            }*/
+                JSONObject ObJson = new JSONObject();
+                try {
+                    ObJson.put("deviceID",deviceID);
+                    ObJson.put("sensorType","accelerometer");
+                    JSONArray array = new JSONArray();
+                    JSONObject values = new JSONObject();
+                    for (int i=0; i<clone.size(); i++) {
+                        values.put("timeStamp", clone.get(i)[0].toString());
+                        values.put("x", clone.get(i)[1].toString());
+                        values.put("y", clone.get(i)[2].toString());
+                        values.put("z", clone.get(i)[3].toString());
+                        array.put(values);
+                    }
+                    ObJson.put("data",array);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+                    mTcpClient.sendMessage(ObJson.toString());
+                }
+            }
         }
 
     }
@@ -176,8 +209,9 @@ public class AccelerometerSensorCollector extends SensorCollector
     }
 
     public static void closeSocket(String deviceID){
-        // disconnect to the server
-        mTcpClient.stopClient(deviceID + " Accelerometer: ");
+        // disconnect from the server
+        //mTcpClient.stopClient(deviceID + " Accelerometer: ");
+        mTcpClient.deregister();
     }
 
     private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
@@ -185,8 +219,8 @@ public class AccelerometerSensorCollector extends SensorCollector
         @Override
         protected TCPClient doInBackground(String... message) {
 
-            mTcpClient = new TCPClient();
-            mTcpClient.run();
+            mTcpClient = TCPClient.getInstance();
+            mTcpClient.register();
 
             return null;
         }

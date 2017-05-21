@@ -15,9 +15,29 @@ public class TCPClient {
     private boolean mRun = false;
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
+    private static TCPClient obj = new TCPClient();
+    private Integer counter = 0;
 
     public TCPClient() {
 
+    }
+
+    public static TCPClient getInstance(){
+        return obj;
+    }
+
+    public void register(){
+        counter++;
+        if(counter == 1){
+            run();
+        }
+    }
+
+    public void deregister(){
+        counter--;
+        if(counter == 0){
+            stopClient("Socket");
+        }
     }
 
     public boolean getMRun(){
@@ -33,7 +53,7 @@ public class TCPClient {
 
     public void stopClient(String prefix) {
 
-        sendMessage(prefix + "Closed Connection");
+        sendMessage(prefix + " Closed Connection");
 
         mRun = false;
 

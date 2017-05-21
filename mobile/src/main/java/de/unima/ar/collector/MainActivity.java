@@ -1179,7 +1179,8 @@ public class MainActivity extends AppCompatActivity
                                 @Override
                                 public void run()
                                 {
-                                    Utils.makeToast2(MainActivity.this, R.string.sensor_cache_to_database, Toast.LENGTH_LONG);
+                                    //Utils.makeToast2(MainActivity.this, R.string.sensor_cache_to_database, Toast.LENGTH_LONG);
+                                    Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
                                     //SensorDataUtil.flushSensorDataCache(sensorID, null);
                                     SensorDataUtil.closeSocket(sensorID, deviceID);
                                 }

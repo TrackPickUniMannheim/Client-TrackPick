@@ -46,7 +46,6 @@ public class DBUtils
     public static List<String[]> manageCache(String deviceID, Map<String, List<String[]>> cache, ContentValues newValues, int cacheSize)
     {
 
-        Log.i("DBUtils", "ManageCache");
         if(!cache.containsKey(deviceID)) {
             cache.put(deviceID, new ArrayList<String[]>());
 
@@ -61,9 +60,8 @@ public class DBUtils
             entry[i] = newValues.getAsString(keys[i]);
         }
         cache.get(deviceID).add(entry);
-        int size = cache.get(deviceID).size();
-        if(size <= cacheSize) {
-            Log.i("DBUtils", String.valueOf(size) );
+
+        if(cache.get(deviceID).size() <= cacheSize) {
             return null;
         }
 
