@@ -39,6 +39,7 @@ public class MagneticFieldSensorCollector extends SensorCollector
     private static Map<String, List<String[]>> cache    = new HashMap<>();
 
     private static TCPClient mTcpClient;
+    public static String currentJson;
 
 
     public MagneticFieldSensorCollector(Sensor sensor)
@@ -153,7 +154,8 @@ public class MagneticFieldSensorCollector extends SensorCollector
                     e.printStackTrace();
                 }
 
-                mTcpClient.sendMessage(ObJson.toString());
+                currentJson = ObJson.toString();
+                new MagneticFieldSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
             return;
         } else{
@@ -177,7 +179,8 @@ public class MagneticFieldSensorCollector extends SensorCollector
                     e.printStackTrace();
                 }
                 if(mTcpClient!=null && mTcpClient.getMRun() != false) {
-                    mTcpClient.sendMessage(ObJson.toString());
+                    currentJson = ObJson.toString();
+                    new MagneticFieldSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
         }
@@ -197,8 +200,8 @@ public class MagneticFieldSensorCollector extends SensorCollector
 
     public static void closeSocket(String deviceID){
         // disconnect to the server
-        //mTcpClient.stopClient(deviceID + " MagneticField: ");
-        mTcpClient.deregister();
+        mTcpClient.stopClient(deviceID + " MagneticField: ");
+        //mTcpClient.deregister();
     }
 
     private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
@@ -206,8 +209,23 @@ public class MagneticFieldSensorCollector extends SensorCollector
         @Override
         protected TCPClient doInBackground(String... message) {
 
-            mTcpClient = TCPClient.getInstance();
-            mTcpClient.register();
+            mTcpClient = new TCPClient();
+            mTcpClient.run();
+
+            //mTcpClient = TCPClient.getInstance();
+            //mTcpClient.register();
+
+            return null;
+        }
+
+    }
+
+    private static class SendTask extends AsyncTask<String,String,TCPClient> {
+
+        @Override
+        protected TCPClient doInBackground(String... message) {
+
+            mTcpClient.sendMessage(MagneticFieldSensorCollector.currentJson);
 
             return null;
         }

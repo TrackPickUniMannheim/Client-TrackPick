@@ -38,6 +38,7 @@ public class GyroscopeSensorCollector extends SensorCollector
     private static Map<String, List<String[]>> cache    = new HashMap<>();
 
     private static TCPClient mTcpClient;
+    public static String currentJson;
 
     public GyroscopeSensorCollector(Sensor sensor)
     {
@@ -151,7 +152,8 @@ public class GyroscopeSensorCollector extends SensorCollector
                     e.printStackTrace();
                 }
 
-                mTcpClient.sendMessage(ObJson.toString());
+                currentJson = ObJson.toString();
+                new GyroscopeSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
             return;
         } else {
@@ -175,7 +177,8 @@ public class GyroscopeSensorCollector extends SensorCollector
                     e.printStackTrace();
                 }
                 if(mTcpClient!=null && mTcpClient.getMRun() != false) {
-                    mTcpClient.sendMessage(ObJson.toString());
+                    currentJson = ObJson.toString();
+                    new GyroscopeSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
         }
@@ -195,8 +198,8 @@ public class GyroscopeSensorCollector extends SensorCollector
 
     public static void closeSocket(String deviceID){
         // disconnect to the server
-        //mTcpClient.stopClient(deviceID + " Gyroscope: ");
-        mTcpClient.deregister();
+        mTcpClient.stopClient(deviceID + " Gyroscope: ");
+        //mTcpClient.deregister();
     }
 
     private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
@@ -204,8 +207,23 @@ public class GyroscopeSensorCollector extends SensorCollector
         @Override
         protected TCPClient doInBackground(String... message) {
 
-            mTcpClient = TCPClient.getInstance();
-            mTcpClient.register();
+            mTcpClient = new TCPClient();
+            mTcpClient.run();
+
+            //mTcpClient = TCPClient.getInstance();
+            //mTcpClient.register();
+
+            return null;
+        }
+
+    }
+
+    private static class SendTask extends AsyncTask<String,String,TCPClient> {
+
+        @Override
+        protected TCPClient doInBackground(String... message) {
+
+            mTcpClient.sendMessage(GyroscopeSensorCollector.currentJson);
 
             return null;
         }

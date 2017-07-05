@@ -9,20 +9,20 @@ import java.net.Socket;
 public class TCPClient {
 
     public static final String SERVER_IP = "10.0.2.2"; //later Server's IP Adress
-    //public static final String SERVER_IP = "192.168.43.220"; //later Server's IP Adress
+    //public static final String SERVER_IP = "10.87.90.148"; //later Server's IP Adress
     public static final int SERVER_PORT = 9999;
     private String mServerMessage;
     private boolean mRun = false;
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
-    private static TCPClient obj = new TCPClient();
-    private Integer counter = 0;
+    //private static TCPClient obj = new TCPClient();
+    //private Integer counter = 0;
 
     public TCPClient() {
 
     }
 
-    public static TCPClient getInstance(){
+    /*public static TCPClient getInstance(){
         return obj;
     }
 
@@ -38,7 +38,7 @@ public class TCPClient {
         if(counter == 0){
             stopClient("Socket");
         }
-    }
+    }*/
 
     public boolean getMRun(){
         return mRun;
@@ -87,7 +87,7 @@ public class TCPClient {
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 // send first message
-                sendMessage("Connected!");
+                //sendMessage("Connected");
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
