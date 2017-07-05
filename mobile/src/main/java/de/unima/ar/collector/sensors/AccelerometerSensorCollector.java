@@ -38,6 +38,7 @@ public class AccelerometerSensorCollector extends SensorCollector
     private static Map<String, List<String[]>> cache    = new HashMap<>();
 
     private static TCPClient mTcpClient;
+    public static String currentJson;
 
 
     public AccelerometerSensorCollector(Sensor sensor)
@@ -166,7 +167,9 @@ public class AccelerometerSensorCollector extends SensorCollector
                     e.printStackTrace();
                 }
 
-                mTcpClient.sendMessage(ObJson.toString());
+                currentJson = ObJson.toString();
+                new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
             }
             return;
         } else {
@@ -190,7 +193,8 @@ public class AccelerometerSensorCollector extends SensorCollector
                     e.printStackTrace();
                 }
                 if(mTcpClient!=null && mTcpClient.getMRun() != false) {
-                    mTcpClient.sendMessage(ObJson.toString());
+                    currentJson = ObJson.toString();
+                    new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
         }
@@ -199,7 +203,7 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void flushDBCache(String deviceID)
     {
-
+        //TODO: Implenent Flush Cache
     }
 
     public static void openSocket(String deviceID){
@@ -210,8 +214,8 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void closeSocket(String deviceID){
         // disconnect from the server
-        //mTcpClient.stopClient(deviceID + " Accelerometer: ");
-        mTcpClient.deregister();
+        mTcpClient.stopClient(deviceID + " Accelerometer: ");
+        //mTcpClient.deregister();
     }
 
     private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
@@ -219,8 +223,23 @@ public class AccelerometerSensorCollector extends SensorCollector
         @Override
         protected TCPClient doInBackground(String... message) {
 
-            mTcpClient = TCPClient.getInstance();
-            mTcpClient.register();
+            mTcpClient = new TCPClient();
+            mTcpClient.run();
+
+            //mTcpClient = TCPClient.getInstance();
+            //mTcpClient.register();
+
+            return null;
+        }
+
+    }
+
+    private static class SendTask extends AsyncTask<String,String,TCPClient> {
+
+        @Override
+        protected TCPClient doInBackground(String... message) {
+
+            mTcpClient.sendMessage(AccelerometerSensorCollector.currentJson);
 
             return null;
         }
