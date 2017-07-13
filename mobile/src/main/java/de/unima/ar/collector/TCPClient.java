@@ -9,7 +9,7 @@ import java.net.Socket;
 public class TCPClient {
 
     public static final String SERVER_IP = "10.0.2.2"; //later Server's IP Adress
-    //public static final String SERVER_IP = "10.87.90.148"; //later Server's IP Adress
+    //public static final String SERVER_IP = "192.168.43.29"; //later Server's IP Adress
     public static final int SERVER_PORT = 9999;
     private String mServerMessage;
     private boolean mRun = false;
@@ -53,7 +53,7 @@ public class TCPClient {
 
     public void stopClient(String prefix) {
 
-        sendMessage(prefix + " Closed Connection");
+        //sendMessage(prefix + " Closed Connection");
 
         mRun = false;
 

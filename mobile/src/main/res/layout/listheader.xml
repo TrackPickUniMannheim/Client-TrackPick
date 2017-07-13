@@ -10,5 +10,5 @@
     android:paddingRight="0dip"
     android:paddingEnd="0dip"
     android:textColor="#FFFFFF"
-    android:background="#B40808"
+    android:background="?attr/colorPrimaryDark"
     style="?android:attr/listSeparatorTextViewStyle" />
