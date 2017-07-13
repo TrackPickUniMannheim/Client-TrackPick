@@ -36,7 +36,7 @@ public class TCPClient {
     public void deregister(){
         counter--;
         if(counter == 0){
-            stopClient("Socket");
+            stopClient();
         }
     }*/
 
@@ -51,9 +51,11 @@ public class TCPClient {
         }
     }
 
-    public void stopClient(String prefix) {
+    public void stopClient(boolean finalFlag) {
 
-        //sendMessage(prefix + " Closed Connection");
+        if(finalFlag){
+            sendMessage("Disconnect");
+        }
 
         mRun = false;
 
@@ -67,14 +69,13 @@ public class TCPClient {
         mServerMessage = null;
     }
 
-    public void run() {
+    public void run(boolean initialFlag) {
 
         mRun = true;
 
         try {
             InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-            Log.i("TCP Client",serverAddr.toString());
-            Log.i("TCP Client", "C: Connecting...");
+            Log.i("TCP Client", "C: Connecting..." + serverAddr.toString());
 
             //create a socket to make the connection with the server
             Socket socket = new Socket(serverAddr, SERVER_PORT);
@@ -86,16 +87,17 @@ public class TCPClient {
                 mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                // send first message
-                //sendMessage("Connected");
+                if(initialFlag){
+                    sendMessage("Connect");
+                }
 
-                //in this while the client listens for the messages sent by the server
+                //listens for messages from server
                 while (mRun) {
 
                     mServerMessage = mBufferIn.readLine();
 
                     if (mServerMessage != null ) {
-                        // here a received message should be handled
+                        //do nothing
                     }
                 }
 

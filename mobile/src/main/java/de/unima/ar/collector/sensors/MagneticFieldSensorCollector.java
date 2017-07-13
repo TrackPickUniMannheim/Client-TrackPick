@@ -200,7 +200,7 @@ public class MagneticFieldSensorCollector extends SensorCollector
 
     public static void closeSocket(String deviceID){
         // disconnect to the server
-        mTcpClient.stopClient(deviceID + " MagneticField: ");
+        mTcpClient.stopClient(false);
         //mTcpClient.deregister();
     }
 
@@ -210,7 +210,7 @@ public class MagneticFieldSensorCollector extends SensorCollector
         protected TCPClient doInBackground(String... message) {
 
             mTcpClient = new TCPClient();
-            mTcpClient.run();
+            mTcpClient.run(false);
 
             //mTcpClient = TCPClient.getInstance();
             //mTcpClient.register();
