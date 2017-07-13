@@ -83,6 +83,9 @@ abstract public class SensorCollector implements SensorEventListener
         return (sensor == null) ? null : sensor;
     }
 
+    public void clearCache(String id) {
+        return;
+    }
 
     // Gibt den TYPE des Sensors zurück
     public abstract int getType();

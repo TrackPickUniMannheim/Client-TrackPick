@@ -9,6 +9,7 @@
                   android:required="false" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -22,10 +23,11 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
@@ -47,7 +49,7 @@
         <service
             android:name="de.unima.ar.collector.SensorDataCollectorService"
             android:exported="false"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@mipmap/icon"
             android:label="@string/service_name"
             >
             <intent-filter android:label="@string/service_name">

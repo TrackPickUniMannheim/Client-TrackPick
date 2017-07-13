@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import de.unima.ar.collector.util.SensorDataUtil;
 
 
 /**
@@ -62,6 +65,9 @@ public class SensorCollectorManager
         return enabledCollectors.size();
     }
 
+    public void clearCache(int id, String deviceID) {
+        this.sensorCollectors.get(id).clearCache(deviceID);
+    }
 
     public float getPowerUsed()
     {
@@ -175,18 +181,22 @@ public class SensorCollectorManager
         SensorCollector sel = this.sensorCollectors.get(type);
 
         if(sel == null || !sel.registerCollector || sel.isRegistered || !enabledCollectors.contains(sel.getType())) {
+            Log.i("CACHE SIZE", "Sensor was null");
             return;
         }
 
         if(sel.getSensor() != null) {
             this.sensorManager.registerListener(sel, sel.getSensor(), sel.getSensorRate());
             sel.isRegistered = true;
+            Log.i("CACHE SIZE", "Sensor was registered");
         } else {    // Fall 2: Es gibt einen Default Sensor für den Sensortyp
             if(this.sensorManager.getDefaultSensor(sel.getType()) != null) {
                 this.sensorManager.registerListener(sel, this.sensorManager.getDefaultSensor(sel.getType()), sel.getSensorRate());
                 sel.isRegistered = true;
+                Log.i("CACHE SIZE", "Sensor was registered with default sensor");
             } else { // Fall 3: Es existiert kein Default Sensor für den Sensortyp
                 // do nothing
+                Log.i("CACHE SIZE", "Sensor was not registered");
             }
         }
     }
@@ -210,6 +220,7 @@ public class SensorCollectorManager
             }
 
             this.sensorManager.unregisterListener(sel);
+            Log.d("UNREGISTER DEBUG", "Unregistering " + SensorDataUtil.getSensorType(type));
             sel.isRegistered = false;
             return true;
         }
