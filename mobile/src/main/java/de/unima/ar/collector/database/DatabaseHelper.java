@@ -120,14 +120,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public static void createDeviceDependentTables(String deviceID)
     {
-        //AccelerometerSensorCollector.createDBStorage(deviceID);
+        AccelerometerSensorCollector.createDBStorage(deviceID);
         AmbientTemperatureSensorCollector.createDBStorage(deviceID);
         GPSCollector.createDBStorage(deviceID);
         GravitySensorCollector.createDBStorage(deviceID);
-        //GyroscopeSensorCollector.createDBStorage(deviceID);
+        GyroscopeSensorCollector.createDBStorage(deviceID);
         LightSensorCollector.createDBStorage(deviceID);
         LinearAccelerationSensorCollector.createDBStorage(deviceID);
-        //MagneticFieldSensorCollector.createDBStorage(deviceID);
+        MagneticFieldSensorCollector.createDBStorage(deviceID);
         MicrophoneCollector.createDBStorage(deviceID);
         OrientationSensorCollector.createDBStorage(deviceID);
         PressureSensorCollector.createDBStorage(deviceID);
