@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity
 
     private View GPSView;
     private boolean recordFlag = false;
-    private static TCPClient mTcpClient;
+    //private static TCPClient mTcpClient;
 
     private SensorSelfTest lastSensorSelfTest = null;
 
@@ -322,14 +322,7 @@ public class MainActivity extends AppCompatActivity
         if (this.recordFlag) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             Toast.makeText(getBaseContext(), "Stopping recording", Toast.LENGTH_LONG).show();
-
-            //Send "Disonnect" to Server
-            MainActivity.mTcpClient.stopClient(true);
         } else {
-            //Send "Connect" to Server
-            ConnectTask task = new ConnectTask();
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             Toast.makeText(getBaseContext(), "Starting recording", Toast.LENGTH_LONG).show();
         }
@@ -1644,18 +1637,5 @@ public class MainActivity extends AppCompatActivity
 
         // destroyed
         //        Toast.makeText(SensorDataCollectorService.getInstance(), getString(R.string.app_toast_destroy2), Toast.LENGTH_SHORT).show();
-    }
-
-    private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
-
-        @Override
-        protected TCPClient doInBackground(String... message) {
-
-            MainActivity.mTcpClient = new TCPClient();
-            MainActivity.mTcpClient.run(true);
-
-            return null;
-        }
-
     }
 }

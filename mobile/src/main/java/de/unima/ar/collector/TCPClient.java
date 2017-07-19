@@ -16,7 +16,7 @@ public class TCPClient {
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
     //private static TCPClient obj = new TCPClient();
-    //private Integer counter = 0;
+    private static Integer counter = 0;
 
     public TCPClient() {
 
@@ -51,9 +51,9 @@ public class TCPClient {
         }
     }
 
-    public void stopClient(boolean finalFlag) {
-
-        if(finalFlag){
+    public void stopClient() {
+        TCPClient.counter--;
+        if(counter == 0){
             sendMessage("Disconnect");
         }
 
@@ -69,7 +69,7 @@ public class TCPClient {
         mServerMessage = null;
     }
 
-    public void run(boolean initialFlag) {
+    public void run() {
 
         mRun = true;
 
@@ -87,9 +87,11 @@ public class TCPClient {
                 mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                if(initialFlag){
+                if(TCPClient.counter == 0){
                     sendMessage("Connect");
                 }
+
+                TCPClient.counter++;
 
                 //listens for messages from server
                 while (mRun) {
