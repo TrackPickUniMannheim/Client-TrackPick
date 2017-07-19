@@ -47,6 +47,18 @@
     <PreferenceCategory
         android:title="@string/option_export_title">
 
+        <SwitchPreference
+            android:key="server_streaming"
+            android:summary="Stream data directly to server"
+            android:title="Activate Streaming"
+            android:defaultValue="true"/>
+
+        <EditTextPreference
+            android:key="server_ip"
+            android:summary="Server IP Address for Streaming"
+            android:title="Server IP Address"
+            android:defaultValue="192.168.43.29"/>
+
         <de.unima.ar.collector.ui.TextViewPreference
             android:key="database_delete"
             android:summary="@string/option_export_delete_desc"
