@@ -144,6 +144,9 @@ public class MainActivity extends AppCompatActivity
         Settings.ACCLOWPASS = pref.getBoolean("sensor_lowpass", false);
         Settings.SENSOR_DEFAULT_FREQUENCY = Double.parseDouble(pref.getString("sensor_frequency", "50.0f"));
         Settings.LIVE_PLOTTER_ENABLED = pref.getBoolean("live_plotter", true);
+        Settings.STREAMING = pref.getBoolean("server_streaming", true);
+        Settings.SERVER_IP = pref.getString("server_ip","10.0.2.2");
+        Settings.SERVER_PORT = Integer.parseInt(pref.getString("server_port","9999"));
 
         // register
         String deviceID = DeviceID.get(this);

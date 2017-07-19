@@ -13,6 +13,10 @@ public class Settings
     public static int     DATABASE_CACHE_SIZE    = 10;   // number of entries
     public static String  DATABASE_DELIMITER     = "-#~o~#-";
 
+    public static boolean STREAMING              = true;
+    public static String  SERVER_IP              = "10.0.2.2";
+    public static Integer SERVER_PORT            = 9999;
+
     public static String ACTIVITY_DELIMITER = " - ";
 
     public static int EXPORT_ATONCE = 10000;

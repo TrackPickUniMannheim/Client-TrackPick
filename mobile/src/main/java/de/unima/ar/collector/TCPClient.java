@@ -6,11 +6,12 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import de.unima.ar.collector.shared.Settings;
+
 public class TCPClient {
 
-    public static final String SERVER_IP = "10.0.2.2"; //later Server's IP Adress
-    //public static final String SERVER_IP = "192.168.43.29"; //later Server's IP Adress
-    public static final int SERVER_PORT = 9999;
+    public static String SERVER_IP = Settings.SERVER_IP;
+    public static int SERVER_PORT = Settings.SERVER_PORT;
     private String mServerMessage;
     private boolean mRun = false;
     private PrintWriter mBufferOut;
@@ -70,6 +71,8 @@ public class TCPClient {
     }
 
     public void run() {
+        SERVER_IP = Settings.SERVER_IP;
+        SERVER_PORT = Settings.SERVER_PORT;
 
         mRun = true;
 
