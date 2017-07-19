@@ -84,7 +84,12 @@ public class AccelerometerSensorCollector extends SensorCollector
         newValues.put(valueNames[3], time);
 
         String deviceID = DeviceID.get(SensorDataCollectorService.getInstance());
-        AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
+        if(Settings.STREAMING){
+            AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
+        }else{
+            AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
+        }
+
         AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ x, y, z });
     }
 
@@ -198,12 +203,37 @@ public class AccelerometerSensorCollector extends SensorCollector
                 }
             }
         }
+    }
 
+    public static void createDBStorage(String deviceID)
+    {
+        String sqlTable = "CREATE TABLE IF NOT EXISTS " + SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER + " (id INTEGER PRIMARY KEY, " + valueNames[3] + " INTEGER, " + valueNames[0] + " REAL, " + valueNames[1] + " REAL, " + valueNames[2] + " REAL)";
+        SQLDBController.getInstance().execSQL(sqlTable);
+    }
+
+
+    public static void writeDBStorage(String deviceID, ContentValues newValues)
+    {
+        String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER;
+
+        if(Settings.DATABASE_DIRECT_INSERT) {
+            SQLDBController.getInstance().insert(tableName, null, newValues);
+            return;
+        }
+
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        if(clone != null) {
+            SQLDBController.getInstance().bulkInsert(tableName, clone);
+        }
     }
 
     public static void flushDBCache(String deviceID)
     {
-        //TODO: Implenent Flush Cache
+        DBUtils.flushCache(SQLTableName.ACCELEROMETER, cache, deviceID);
+    }
+
+    public void clearCache(String id) {
+        cache.remove(id);
     }
 
     public static void openSocket(String deviceID){
