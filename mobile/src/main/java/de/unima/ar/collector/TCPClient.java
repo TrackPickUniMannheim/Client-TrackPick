@@ -6,17 +6,18 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import de.unima.ar.collector.shared.Settings;
+
 public class TCPClient {
 
-    public static final String SERVER_IP = "10.0.2.2"; //later Server's IP Adress
-    //public static final String SERVER_IP = "192.168.43.29"; //later Server's IP Adress
-    public static final int SERVER_PORT = 9999;
+    public static String SERVER_IP = Settings.SERVER_IP;
+    public static int SERVER_PORT = Settings.SERVER_PORT;
     private String mServerMessage;
     private boolean mRun = false;
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
     //private static TCPClient obj = new TCPClient();
-    //private Integer counter = 0;
+    private static Integer counter = 0;
 
     public TCPClient() {
 
@@ -36,7 +37,7 @@ public class TCPClient {
     public void deregister(){
         counter--;
         if(counter == 0){
-            stopClient("Socket");
+            stopClient();
         }
     }*/
 
@@ -51,9 +52,11 @@ public class TCPClient {
         }
     }
 
-    public void stopClient(String prefix) {
-
-        //sendMessage(prefix + " Closed Connection");
+    public void stopClient() {
+        TCPClient.counter--;
+        if(counter == 0){
+            sendMessage("Disconnect");
+        }
 
         mRun = false;
 
@@ -68,13 +71,14 @@ public class TCPClient {
     }
 
     public void run() {
+        SERVER_IP = Settings.SERVER_IP;
+        SERVER_PORT = Settings.SERVER_PORT;
 
         mRun = true;
 
         try {
             InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-            Log.i("TCP Client",serverAddr.toString());
-            Log.i("TCP Client", "C: Connecting...");
+            Log.i("TCP Client", "C: Connecting..." + serverAddr.toString());
 
             //create a socket to make the connection with the server
             Socket socket = new Socket(serverAddr, SERVER_PORT);
@@ -86,16 +90,19 @@ public class TCPClient {
                 mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                // send first message
-                //sendMessage("Connected");
+                if(TCPClient.counter == 0){
+                    sendMessage("Connect");
+                }
 
-                //in this while the client listens for the messages sent by the server
+                TCPClient.counter++;
+
+                //listens for messages from server
                 while (mRun) {
 
                     mServerMessage = mBufferIn.readLine();
 
                     if (mServerMessage != null ) {
-                        // here a received message should be handled
+                        //do nothing
                     }
                 }
 

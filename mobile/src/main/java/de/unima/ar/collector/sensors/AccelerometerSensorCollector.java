@@ -214,7 +214,7 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void closeSocket(String deviceID){
         // disconnect from the server
-        mTcpClient.stopClient(deviceID + " Accelerometer: ");
+        mTcpClient.stopClient();
         //mTcpClient.deregister();
     }
 

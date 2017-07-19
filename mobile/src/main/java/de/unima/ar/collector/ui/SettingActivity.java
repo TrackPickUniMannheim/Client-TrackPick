@@ -8,6 +8,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
@@ -115,6 +116,16 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                 break;
             case "database_csv":
                 databaseToCSV();
+                break;
+            case "server_streaming":
+                Settings.STREAMING = sharedPreferences.getBoolean(key, true);
+                //TODO: disable database setting
+                break;
+            case "server_ip":
+                Settings.SERVER_IP = sharedPreferences.getString(key,"10.0.2.2");
+                break;
+            case "server_port":
+                Settings.SERVER_PORT = Integer.parseInt(sharedPreferences.getString(key,"9999"));
                 break;
             default:
         }

@@ -198,7 +198,7 @@ public class GyroscopeSensorCollector extends SensorCollector
 
     public static void closeSocket(String deviceID){
         // disconnect to the server
-        mTcpClient.stopClient(deviceID + " Gyroscope: ");
+        mTcpClient.stopClient();
         //mTcpClient.deregister();
     }
 
