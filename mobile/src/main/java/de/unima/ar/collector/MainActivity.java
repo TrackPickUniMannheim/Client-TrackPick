@@ -73,6 +73,7 @@ import de.unima.ar.collector.controller.AdapterController;
 import de.unima.ar.collector.controller.BluetoothController;
 import de.unima.ar.collector.controller.SQLDBController;
 import de.unima.ar.collector.database.DatabaseDelete;
+import de.unima.ar.collector.database.DatabaseExportSQL;
 import de.unima.ar.collector.database.DatabaseHelper;
 import de.unima.ar.collector.extended.Plotter;
 import de.unima.ar.collector.extended.SensorSelfTest;
@@ -359,7 +360,11 @@ public class MainActivity extends AppCompatActivity
                             DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 0); // microseconds -> hertz
                             SensorDataUtil.flushSensorDataCacheSync(id, DeviceID.get(MainActivity.this));
                             BroadcastService.getInstance().sendMessage("/sensor/unregister", String.valueOf(id));
-                            SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
+                            if(Settings.STREAMING){
+                                SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
+                            }else {
+                                SensorDataUtil.flushSensorDataCache(id, DeviceID.get(MainActivity.this));
+                            }
                         }
                     }
                     else {
@@ -372,7 +377,9 @@ public class MainActivity extends AppCompatActivity
                             }
                             DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 1); // microseconds -> hertz
                             service.getSCM().registerSensorCollector(id);
-                            SensorDataUtil.openSocket(id, DeviceID.get(MainActivity.this));
+                            if(Settings.STREAMING){
+                                SensorDataUtil.openSocket(id, DeviceID.get(MainActivity.this));
+                            }
                         }
                     }
                 }else{
@@ -1285,8 +1292,13 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     //Utils.makeToast2(MainActivity.this, R.string.sensor_cache_to_database, Toast.LENGTH_LONG);
                                     Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
-                                    //SensorDataUtil.flushSensorDataCache(sensorID, null);
-                                    SensorDataUtil.closeSocket(sensorID, deviceID);
+
+                                    if(Settings.STREAMING){
+                                        SensorDataUtil.closeSocket(sensorID, deviceID);
+                                    }else{
+                                        SensorDataUtil.flushSensorDataCache(sensorID, null);
+                                    }
+
                                 }
                             }).start();
                         }
@@ -1299,7 +1311,9 @@ public class MainActivity extends AppCompatActivity
                             }
                             DBUtils.updateSensorStatus(sensorID, (1000 * 1000) / sc.getSensorRate(), 1); // microseconds -> hertz
                             service.getSCM().registerSensorCollector(sensorID);
-                            SensorDataUtil.openSocket(sensorID, deviceID);
+                            if(Settings.STREAMING){
+                                SensorDataUtil.openSocket(sensorID, deviceID);
+                            }
                             chBx.setChecked(true);
                         }
                     }
