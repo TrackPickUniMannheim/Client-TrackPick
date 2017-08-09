@@ -1,19 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         applicationId "de.unima.ar.collector"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 26
         versionCode 20
-        versionName "1.5.19"
-        multiDexEnabled true
-    }
-    dexOptions {
-        javaMaxHeapSize "4g"
+        versionName "1.5.22"
     }
     buildTypes {
         release {
@@ -25,10 +21,11 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    //compile 'com.android.support:appcompat-v7:24.1.1'
-    //compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.google.android.gms:play-services:9.2.1'
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
+    compile 'com.google.android.gms:play-services-maps:11.0.1'
+    compile 'com.google.android.gms:play-services-location:11.0.1'
+    compile 'com.google.android.gms:play-services-wearable:11.0.1'
+    compile 'com.google.guava:guava:20.0'
     wearApp project(':wear')
     compile project(':shared')
 }

@@ -295,13 +295,21 @@ class Tasks
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
                     AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
-                AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
+                if(Settings.STREAMING){
+                    AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
+                }else{
+                    AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
+                }
                 break;
             case 2:
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
                     MagneticFieldSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
-                MagneticFieldSensorCollector.writeSensorData(deviceID, newValues);
+                if(Settings.STREAMING){
+                    MagneticFieldSensorCollector.writeSensorData(deviceID, newValues);
+                }else{
+                    MagneticFieldSensorCollector.writeDBStorage(deviceID, newValues);
+                }
                 break;
             case 3:
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
@@ -313,7 +321,11 @@ class Tasks
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
                     GyroscopeSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
-                GyroscopeSensorCollector.writeSensorData(deviceID, newValues);
+                if(Settings.STREAMING){
+                    GyroscopeSensorCollector.writeSensorData(deviceID, newValues);
+                }else{
+                    GyroscopeSensorCollector.writeDBStorage(deviceID, newValues);
+                }
                 break;
             case 6:
                 if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
