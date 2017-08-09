@@ -144,7 +144,8 @@ public class GyroscopeSensorCollector extends SensorCollector
 
     public static void writeSensorData(String deviceID, ContentValues newValues) {
 
-        if (Settings.DATABASE_DIRECT_INSERT) {
+        //if (Settings.DATABASE_DIRECT_INSERT) {
+        if(true){
             if (mTcpClient != null && mTcpClient.getMRun() != false) {
                 JSONObject ObJson = new JSONObject();
                 try {

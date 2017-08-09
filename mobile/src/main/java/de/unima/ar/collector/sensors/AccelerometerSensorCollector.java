@@ -89,7 +89,6 @@ public class AccelerometerSensorCollector extends SensorCollector
         }else{
             AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
         }
-
         AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ x, y, z });
     }
 
@@ -154,7 +153,8 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void writeSensorData(String deviceID, ContentValues newValues)
     {
-        if(Settings.DATABASE_DIRECT_INSERT) {
+        //if(Settings.DATABASE_DIRECT_INSERT) {
+        if(true){
             if(mTcpClient!=null && mTcpClient.getMRun() != false) {
                 JSONObject ObJson = new JSONObject();
                 try {
