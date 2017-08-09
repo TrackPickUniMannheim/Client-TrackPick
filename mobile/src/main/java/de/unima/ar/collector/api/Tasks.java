@@ -296,7 +296,7 @@ class Tasks
                     AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
                 if(Settings.STREAMING){
-                    AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
+                    AccelerometerSensorCollector.writeWatchSensorData(deviceID, newValues);
                 }else{
                     AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
                 }
@@ -306,7 +306,7 @@ class Tasks
                     MagneticFieldSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
                 if(Settings.STREAMING){
-                    MagneticFieldSensorCollector.writeSensorData(deviceID, newValues);
+                    MagneticFieldSensorCollector.writeWatchSensorData(deviceID, newValues);
                 }else{
                     MagneticFieldSensorCollector.writeDBStorage(deviceID, newValues);
                 }
@@ -322,7 +322,7 @@ class Tasks
                     GyroscopeSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
                 }
                 if(Settings.STREAMING){
-                    GyroscopeSensorCollector.writeSensorData(deviceID, newValues);
+                    GyroscopeSensorCollector.writeWatchSensorData(deviceID, newValues);
                 }else{
                     GyroscopeSensorCollector.writeDBStorage(deviceID, newValues);
                 }

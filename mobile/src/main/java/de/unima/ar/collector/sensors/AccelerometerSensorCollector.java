@@ -38,7 +38,9 @@ public class AccelerometerSensorCollector extends SensorCollector
     private static Map<String, List<String[]>> cache    = new HashMap<>();
 
     private static TCPClient mTcpClient;
+    private static TCPClient mTcpClientWatch;
     public static String currentJson;
+    public static String currentJsonWatch;
 
 
     public AccelerometerSensorCollector(Sensor sensor)
@@ -154,7 +156,7 @@ public class AccelerometerSensorCollector extends SensorCollector
     public static void writeSensorData(String deviceID, ContentValues newValues)
     {
         //if(Settings.DATABASE_DIRECT_INSERT) {
-        if(true){
+        if(false){
             if(mTcpClient!=null && mTcpClient.getMRun() != false) {
                 JSONObject ObJson = new JSONObject();
                 try {
@@ -185,8 +187,8 @@ public class AccelerometerSensorCollector extends SensorCollector
                     ObJson.put("deviceID",deviceID);
                     ObJson.put("sensorType","accelerometer");
                     JSONArray array = new JSONArray();
-                    JSONObject values = new JSONObject();
-                    for (int i=0; i<clone.size(); i++) {
+                    for (int i=1; i<clone.size(); i++) {
+                        JSONObject values = new JSONObject();
                         values.put("timeStamp", clone.get(i)[0].toString());
                         values.put("x", clone.get(i)[1].toString());
                         values.put("y", clone.get(i)[2].toString());
@@ -200,6 +202,60 @@ public class AccelerometerSensorCollector extends SensorCollector
                 if(mTcpClient!=null && mTcpClient.getMRun() != false) {
                     currentJson = ObJson.toString();
                     new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+            }
+        }
+    }
+
+    public static void writeWatchSensorData(String deviceID, ContentValues newValues)
+    {
+        //if(Settings.DATABASE_DIRECT_INSERT) {
+        if(true){
+            if(mTcpClientWatch!=null && mTcpClientWatch.getMRun() != false) {
+                JSONObject ObJson = new JSONObject();
+                try {
+                    ObJson.put("deviceID",deviceID);
+                    ObJson.put("sensorType","accelerometer");
+                    JSONArray array = new JSONArray();
+                    JSONObject values = new JSONObject();
+                    values.put("timeStamp", newValues.getAsString("attr_time"));
+                    values.put("x", newValues.getAsString("attr_x"));
+                    values.put("y", newValues.getAsString("attr_y"));
+                    values.put("z", newValues.getAsString("attr_z"));
+                    array.put(values);
+                    ObJson.put("data",array);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                currentJsonWatch = ObJson.toString();
+                new AccelerometerSensorCollector.SendTaskWatch().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            }
+            return;
+        } else {
+            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
+            if(clone != null) {
+                JSONObject ObJson = new JSONObject();
+                try {
+                    ObJson.put("deviceID",deviceID);
+                    ObJson.put("sensorType","accelerometer");
+                    JSONArray array = new JSONArray();
+                    for (int i=1; i<clone.size(); i++) {
+                        JSONObject values = new JSONObject();
+                        values.put("timeStamp", clone.get(i)[0].toString());
+                        values.put("x", clone.get(i)[1].toString());
+                        values.put("y", clone.get(i)[2].toString());
+                        values.put("z", clone.get(i)[3].toString());
+                        array.put(values);
+                    }
+                    ObJson.put("data",array);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(mTcpClientWatch!=null && mTcpClientWatch.getMRun() != false) {
+                    currentJson = ObJson.toString();
+                    new AccelerometerSensorCollector.SendTaskWatch().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
         }
@@ -240,6 +296,9 @@ public class AccelerometerSensorCollector extends SensorCollector
         // connect to the server
         ConnectTask task = new ConnectTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        ConnectTaskWatch taskWatch = new ConnectTaskWatch();
+        taskWatch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public static void closeSocket(String deviceID){
@@ -270,6 +329,34 @@ public class AccelerometerSensorCollector extends SensorCollector
         protected TCPClient doInBackground(String... message) {
 
             mTcpClient.sendMessage(AccelerometerSensorCollector.currentJson);
+
+            return null;
+        }
+
+    }
+
+    private static class ConnectTaskWatch extends AsyncTask<String,String,TCPClient> {
+
+        @Override
+        protected TCPClient doInBackground(String... message) {
+
+            mTcpClientWatch = new TCPClient();
+            mTcpClientWatch.run();
+
+            //mTcpClient = TCPClient.getInstance();
+            //mTcpClient.register();
+
+            return null;
+        }
+
+    }
+
+    private static class SendTaskWatch extends AsyncTask<String,String,TCPClient> {
+
+        @Override
+        protected TCPClient doInBackground(String... message) {
+
+            mTcpClientWatch.sendMessage(AccelerometerSensorCollector.currentJsonWatch);
 
             return null;
         }
