@@ -3,6 +3,7 @@ package de.unima.ar.collector.sensors.collectors;
 import android.content.ContentValues;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -103,12 +104,12 @@ public class MagnetometerCollector extends Collector
     {
         String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.MAGNETIC;
 
-        if(Settings.DATABASE_DIRECT_INSERT) {
+        if(Settings.STREAMING) {
             SQLDBController.getInstance().insert(tableName, null, newValues);
             return;
         }
 
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
         if(clone != null) {
             SQLDBController.getInstance().bulkInsert(tableName, clone);
         }
@@ -117,6 +118,11 @@ public class MagnetometerCollector extends Collector
 
     public static void flushDBCache()
     {
-        DBUtils.flushCache(SQLTableName.MAGNETIC, cache);
+        if(cache.keySet().size() != 0) {
+            Log.d("TIMOSENSOR", "FLUSH GYRO INTO DB" + cache.values().iterator().next().size());
+        } else {
+            Log.d("TIMOSENSOR", "FLUSH GYRO INTO DB - CACHE EMPTY");
+        }
+        DBUtils.flushCache(SQLTableName.GYROSCOPE, cache);
     }
 }

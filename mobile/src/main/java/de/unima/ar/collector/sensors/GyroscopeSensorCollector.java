@@ -168,7 +168,7 @@ public class GyroscopeSensorCollector extends SensorCollector
             }
             return;
         } else {
-            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 2));
+            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
             if (clone != null) {
                 JSONObject ObJson = new JSONObject();
                 try {
@@ -204,7 +204,7 @@ public class GyroscopeSensorCollector extends SensorCollector
             return;
         }
 
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
         if(clone != null) {
             SQLDBController.getInstance().bulkInsert(tableName, clone);
         }

@@ -36,7 +36,7 @@ public class GyroscopeCollector extends Collector
 
         String deviceID = DeviceID.get(SensorService.getInstance());
 
-        if(Settings.WEARTRANSFERDIRECT) {
+        if(Settings.STREAMING) {
             String record = valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
             BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
         } else {
@@ -109,7 +109,7 @@ public class GyroscopeCollector extends Collector
             return;
         }
 
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
         if(clone != null) {
             Log.d("TIMOSENSOR", "INSERT GYRO INTO DB");
             SQLDBController.getInstance().bulkInsert(tableName, clone);

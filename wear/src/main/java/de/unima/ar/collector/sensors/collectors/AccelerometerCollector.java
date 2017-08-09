@@ -61,7 +61,7 @@ public class AccelerometerCollector extends Collector
 
         String deviceID = DeviceID.get(SensorService.getInstance());
 
-        if(Settings.WEARTRANSFERDIRECT) {
+        if(Settings.STREAMING) {
             String record = valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
             BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
         } else {
@@ -142,7 +142,7 @@ public class AccelerometerCollector extends Collector
             return;
         }
 
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE ));
         if(clone != null) {
             Log.d("TIMOSENSOR", "INSERT ACC INTO DB");
             SQLDBController.getInstance().bulkInsert(tableName, clone);
