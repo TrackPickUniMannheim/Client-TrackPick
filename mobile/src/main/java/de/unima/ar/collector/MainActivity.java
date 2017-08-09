@@ -317,23 +317,38 @@ public class MainActivity extends AppCompatActivity
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             Toast.makeText(getBaseContext(), "Starting recording", Toast.LENGTH_LONG).show();
         }
-        for (int id: sensors) {
+        for (final int id: sensors) {
 
             // Flag if sensors are recording
             SensorCollector sc = service.getSCM().getSensorCollectors().get(id);
             if(sc != null){
                 if (this.recordFlag) {
-                    if(!service.getSCM().removeSensor("", id)) {
+
+                    if(!service.getSCM().removeSensor(id)) {
                         Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_generel_notify1), Toast.LENGTH_LONG).show();
                     } else {
-                        DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 0); // microseconds -> hertz
-                        SensorDataUtil.flushSensorDataCacheSync(id, DeviceID.get(MainActivity.this));
                         if(Settings.WEARSENSOR) {
                             BroadcastService.getInstance().sendMessage("/sensor/unregister", String.valueOf(id));
                         }
-                        if(Settings.STREAMING){
-                            SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
-                        }
+
+                        DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 0); // microseconds -> hertz
+
+                        new Thread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
+
+                                if(Settings.STREAMING){
+                                    SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
+                                }else{
+                                    SensorDataUtil.flushSensorDataCache(id, null);
+                                }
+
+                            }
+                        }).start();
+
                     }
                 }
                 else {
@@ -356,7 +371,6 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(getBaseContext(), SensorDataUtil.getSensorType(id) + " not supported", Toast.LENGTH_LONG).show();
                 }
             }
-
         }
 
         this.recordFlag = !this.recordFlag;
@@ -1241,7 +1255,7 @@ public class MainActivity extends AppCompatActivity
                     SensorCollector sc = service.getSCM().getSensorCollectors().get(sensorID);
                     // Fall 1: Sensor läuft bereits dann removen wir ihn
                     if(chBx.isChecked()) {
-                        if(!service.getSCM().removeSensor(sensorName, sensorID)) {
+                        if(!service.getSCM().removeSensor(sensorID)) {
                             Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_generel_notify1), Toast.LENGTH_LONG).show();
                         } else {
                             BroadcastService.getInstance().sendMessage("/sensor/unregister", String.valueOf(sensorID));
