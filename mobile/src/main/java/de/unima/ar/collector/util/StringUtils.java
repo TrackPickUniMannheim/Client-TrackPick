@@ -68,4 +68,26 @@ public class StringUtils
 
         return result.toArray(new String[result.size()]);
     }
+
+    public static String[] intoEntries(String s)
+    {
+        List<String> result = new ArrayList<>();
+
+        int counter = 0;
+
+        while(counter <= s.length()) {
+            int pos = s.indexOf("|", counter);
+
+            if(pos == -1) {
+                pos = s.length();
+            }
+
+            String fragment = s.substring(counter, pos);
+            result.add(fragment);
+
+            counter += fragment.length() + 1;
+        }
+
+        return result.toArray(new String[result.size()]);
+    }
 }

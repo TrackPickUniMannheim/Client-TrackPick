@@ -21,6 +21,8 @@ import de.unima.ar.collector.shared.util.DeviceID;
 public class AccelerometerCollector extends Collector
 {
     private static final int      type       = 1;
+    private static int   broadcastCounter    = 0;
+    private static String         record     = "";
     private static final String[] valueNames = new String[]{ "attr_x", "attr_y", "attr_z", "attr_time" };
 
     private boolean isRegistered = false;
@@ -62,8 +64,19 @@ public class AccelerometerCollector extends Collector
         String deviceID = DeviceID.get(SensorService.getInstance());
 
         if(Settings.STREAMING) {
-            String record = valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
-            BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+            if(broadcastCounter == 9){
+                record = record + "|" + valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
+                BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+                broadcastCounter = 0;
+            }else{
+                if(broadcastCounter==0){
+                    record = valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
+                }else{
+                    record = record + "|" + valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
+                }
+                broadcastCounter++;
+            }
+
         } else {
             ContentValues newValues = new ContentValues();
             newValues.put(valueNames[0], x);
