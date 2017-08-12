@@ -173,6 +173,17 @@ class Tasks
                         Utils.makeToast2(context, R.string.preferences_directtransfer_disabled, Toast.LENGTH_SHORT);
                     }
                     break;
+                case "STREAMING":
+                    Log.d("TIMOSENSOR", "STREAMING STATE CHANGED");
+                    SensorService.getInstance().getSCM().unregisterCollectors();    // Not necessary but just to be sure TODO -NullPointer...
+                    SensorDataUtil.flushSensorDataCache(0);                         // there are only data if it is turned off
+                    Settings.STREAMING = Boolean.parseBoolean(value);             // change state
+                    if(Settings.STREAMING) {
+                        Utils.makeToast2(context, R.string.preferences_streaming_enabled, Toast.LENGTH_SHORT);
+                    } else {
+                        Utils.makeToast2(context, R.string.preferences_streaming_disabled, Toast.LENGTH_SHORT);
+                    }
+                    break;
                 default:
                     // nothing
             }

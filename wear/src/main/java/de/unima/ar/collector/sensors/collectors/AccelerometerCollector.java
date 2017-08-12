@@ -21,8 +21,10 @@ import de.unima.ar.collector.shared.util.DeviceID;
 public class AccelerometerCollector extends Collector
 {
     private static final int      type       = 1;
+
     private static int   broadcastCounter    = 0;
     private static String         record     = "";
+
     private static final String[] valueNames = new String[]{ "attr_x", "attr_y", "attr_z", "attr_time" };
 
     private boolean isRegistered = false;
@@ -64,15 +66,15 @@ public class AccelerometerCollector extends Collector
         String deviceID = DeviceID.get(SensorService.getInstance());
 
         if(Settings.STREAMING) {
-            if(broadcastCounter == 9){
+            if(broadcastCounter == Settings.STREAM_BUFFER_SIZE - 1){
                 record = record + "|" + valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
                 BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
                 broadcastCounter = 0;
             }else{
-                if(broadcastCounter==0){
-                    record = valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
-                }else{
+                if(broadcastCounter!=0){
                     record = record + "|" + valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
+                }else{
+                    record = valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
                 }
                 broadcastCounter++;
             }
@@ -149,11 +151,6 @@ public class AccelerometerCollector extends Collector
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
         String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER;
-
-        if(Settings.DATABASE_DIRECT_INSERT) {
-            SQLDBController.getInstance().insert(tableName, null, newValues);
-            return;
-        }
 
         List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE ));
         if(clone != null) {

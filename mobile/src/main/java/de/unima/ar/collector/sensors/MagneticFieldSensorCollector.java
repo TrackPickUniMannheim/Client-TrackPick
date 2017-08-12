@@ -25,6 +25,7 @@ import de.unima.ar.collector.shared.database.SQLTableName;
 import de.unima.ar.collector.shared.util.DeviceID;
 import de.unima.ar.collector.util.DBUtils;
 import de.unima.ar.collector.util.PlotConfiguration;
+import de.unima.ar.collector.util.StringUtils;
 
 
 /**
@@ -40,7 +41,6 @@ public class MagneticFieldSensorCollector extends SensorCollector
 
     private static TCPClient mTcpClient;
     public static String currentJson;
-
 
     public MagneticFieldSensorCollector(Sensor sensor)
     {
@@ -170,7 +170,7 @@ public class MagneticFieldSensorCollector extends SensorCollector
             }
             return;
         } else{
-            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
+            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.STREAM_BUFFER_SIZE));
             if(clone != null) {
                 JSONObject ObJson = new JSONObject();
                 try {
@@ -197,56 +197,29 @@ public class MagneticFieldSensorCollector extends SensorCollector
         }
     }
 
-    public static void writeWatchSensorData(String deviceID, ContentValues newValues)
+    public static void writeWatchSensorData(String deviceID, String[] measures)
     {
-        //if(Settings.DATABASE_DIRECT_INSERT) {
-        if(true){
-            if (mTcpClient != null && mTcpClient.getMRun() != false) {
-                JSONObject ObJson = new JSONObject();
-                try {
-                    ObJson.put("deviceID",deviceID);
-                    ObJson.put("sensorType","magneticField");
-                    JSONArray array = new JSONArray();
-                    JSONObject values = new JSONObject();
-                    values.put("timeStamp", newValues.getAsString("attr_time"));
-                    values.put("x", newValues.getAsString("attr_x"));
-                    values.put("y", newValues.getAsString("attr_y"));
-                    values.put("z", newValues.getAsString("attr_z"));
-                    array.put(values);
-                    ObJson.put("data",array);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                currentJson = ObJson.toString();
-                new MagneticFieldSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        JSONObject ObJson = new JSONObject();
+        try {
+            ObJson.put("deviceID",deviceID);
+            ObJson.put("sensorType","magneticField");
+            JSONArray array = new JSONArray();
+            for(int i=0; i<measures.length; i++) {
+                String[] entries = StringUtils.split(measures[i]);
+                JSONObject values = new JSONObject();
+                values.put("timeStamp", entries[7].toString());
+                values.put("x", entries[1].toString());
+                values.put("y", entries[3].toString());
+                values.put("z", entries[5].toString());
+                array.put(values);
             }
-            return;
-        } else{
-            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
-            if(clone != null) {
-                JSONObject ObJson = new JSONObject();
-                try {
-                    ObJson.put("deviceID",deviceID);
-                    ObJson.put("sensorType","magneticField");
-                    JSONArray array = new JSONArray();
-                    for (int i=1; i<clone.size(); i++) {
-                        JSONObject values = new JSONObject();
-                        values.put("timeStamp", clone.get(i)[0].toString());
-                        values.put("x", clone.get(i)[1].toString());
-                        values.put("y", clone.get(i)[2].toString());
-                        values.put("z", clone.get(i)[3].toString());
-                        array.put(values);
-                    }
-                    ObJson.put("data",array);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if(mTcpClient!=null && mTcpClient.getMRun() != false) {
-                    currentJson = ObJson.toString();
-                    new MagneticFieldSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
-            }
+            ObJson.put("data",array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+            currentJson = ObJson.toString();
+            new MagneticFieldSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 

@@ -28,4 +28,6 @@
     <string name="preferences_directtransfer_disabled">\'Sofortige Übertragung\' deaktiviert</string>
     <string name="preferences_sensors_enabled">\'Sensordaten aufzeichnen\' aktiviert</string>
     <string name="preferences_sensors_disabled">\'Sensordaten aufzeichnen\' deaktiviert</string>
+    <string name="preferences_streaming_enabled">\'Streaming\' aktiviert</string>
+    <string name="preferences_streaming_disabled">\'Streaming\' deaktiviert</string>
 </resources>

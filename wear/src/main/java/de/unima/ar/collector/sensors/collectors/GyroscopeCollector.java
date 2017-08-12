@@ -22,6 +22,9 @@ public class GyroscopeCollector extends Collector
     private static final int      type       = 4;
     private static final String[] valueNames = new String[]{ "attr_x", "attr_y", "attr_z", "attr_time" };
 
+    private static int   broadcastCounter    = 0;
+    private static String         record     = "";
+
     private boolean isRegistered = false;
     private int     sensorRate   = 0;
 
@@ -37,8 +40,19 @@ public class GyroscopeCollector extends Collector
         String deviceID = DeviceID.get(SensorService.getInstance());
 
         if(Settings.STREAMING) {
-            String record = valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
-            BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+            if(broadcastCounter == Settings.STREAM_BUFFER_SIZE - 1){
+                record = record + "|" + valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
+                BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+                broadcastCounter = 0;
+            }else{
+                if(broadcastCounter!=0){
+                    record = record + "|" + valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
+                }else{
+                    record = valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
+                }
+                broadcastCounter++;
+            }
+
         } else {
             ContentValues newValues = new ContentValues();
             newValues.put(valueNames[0], values[0]);
@@ -103,11 +117,6 @@ public class GyroscopeCollector extends Collector
     public static void writeDBStorage(String deviceID, ContentValues newValues)
     {
         String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.GYROSCOPE;
-
-        if(Settings.DATABASE_DIRECT_INSERT) {
-            SQLDBController.getInstance().insert(tableName, null, newValues);
-            return;
-        }
 
         List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
         if(clone != null) {
