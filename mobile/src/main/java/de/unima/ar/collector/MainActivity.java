@@ -20,14 +20,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,7 +54,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,8 +69,6 @@ import de.unima.ar.collector.controller.ActivityController;
 import de.unima.ar.collector.controller.AdapterController;
 import de.unima.ar.collector.controller.BluetoothController;
 import de.unima.ar.collector.controller.SQLDBController;
-import de.unima.ar.collector.database.DatabaseDelete;
-import de.unima.ar.collector.database.DatabaseExportSQL;
 import de.unima.ar.collector.database.DatabaseHelper;
 import de.unima.ar.collector.extended.Plotter;
 import de.unima.ar.collector.extended.SensorSelfTest;
@@ -105,8 +100,6 @@ import de.unima.ar.collector.util.PlotConfiguration;
 import de.unima.ar.collector.util.SensorDataUtil;
 import de.unima.ar.collector.util.StringUtils;
 import de.unima.ar.collector.util.Triple;
-
-import static de.unima.ar.collector.util.SensorDataUtil.getNamesOfEnabledSensors;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -242,12 +235,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onKeyUp(int code, KeyEvent event) {
-        //if (code == 4) {
         if (code == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                this.recordSimulaniously();
-            //} else {
-            //    super.onKeyUp(code, event);
-            //}
+                this.recordSimultaneously();
         }
         return true;
     }
@@ -311,13 +300,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void recordSimulaniously() {
+    public void recordSimultaneously() {
         SensorDataCollectorService service = SensorDataCollectorService.getInstance();
 
 
-        int[] sensors = new int[0];
-
-        sensors = new int[]{
+        int[] sensors = new int[]{
                 SensorDataUtil.getSensorTypeInt("TYPE_ACCELEROMETER"),
                 SensorDataUtil.getSensorTypeInt("TYPE_GYROSCOPE"),
                 SensorDataUtil.getSensorTypeInt("TYPE_MAGNETIC_FIELD")
@@ -330,71 +317,61 @@ public class MainActivity extends AppCompatActivity
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             Toast.makeText(getBaseContext(), "Starting recording", Toast.LENGTH_LONG).show();
         }
-        for (int id: sensors) {
-            if(id < -1) { //mainly for video - check
-                /*CustomCollector cc = service.getSCM().getCustomCollectors().get(id);
-                if(this.recordFlag) {
-                    if(!service.getSCM().unregisterCustomCollector(id)) {
+        for (final int id: sensors) {
+
+            // Flag if sensors are recording
+            SensorCollector sc = service.getSCM().getSensorCollectors().get(id);
+            if(sc != null){
+                if (this.recordFlag) {
+
+                    if(!service.getSCM().removeSensor(id)) {
                         Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_generel_notify1), Toast.LENGTH_LONG).show();
                     } else {
-                        service.getSCM().disableCollectors(id);
-                        DBUtils.updateSensorStatus(id, (int) cc.getSensorRate(), 0);
-                    }
-                } else {
-                    if(!service.getSCM().enableCollectors(id)) {
-                        Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_custom_notify), Toast.LENGTH_LONG).show();
-                    } else {
-                        service.getSCM().registerCustomCollectors();
-                        DBUtils.updateSensorStatus(id, (int) cc.getSensorRate(), 1);
-                    }
-                }*/
-            }
-            else {
-                // Flag if sensors are recording
-                SensorCollector sc = service.getSCM().getSensorCollectors().get(id);
-                if(sc != null){
-                    if (this.recordFlag) {
-                        if(!service.getSCM().removeSensor("", id)) {
-                            Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_generel_notify1), Toast.LENGTH_LONG).show();
-                        } else {
-                            DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 0); // microseconds -> hertz
-                            SensorDataUtil.flushSensorDataCacheSync(id, DeviceID.get(MainActivity.this));
+                        if(Settings.WEARSENSOR) {
                             BroadcastService.getInstance().sendMessage("/sensor/unregister", String.valueOf(id));
-                            if(Settings.STREAMING){
-                                SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
-                            }else {
-                                SensorDataUtil.flushSensorDataCache(id, DeviceID.get(MainActivity.this));
+                        }
+
+                        DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 0); // microseconds -> hertz
+
+                        new Thread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
+
+                                if(Settings.STREAMING){
+                                    SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
+                                }else{
+                                    SensorDataUtil.flushSensorDataCache(id, null);
+                                }
+
                             }
+                        }).start();
+
+                    }
+                }
+                else {
+                    service.getSCM().clearCache(id, DeviceID.get(MainActivity.this));
+                    if(!service.getSCM().enableCollectors(id)) {
+                        Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_generel_notify2), Toast.LENGTH_LONG).show();
+                    } else {
+                        if(Settings.WEARSENSOR) {
+                            BroadcastService.getInstance().sendMessage("/sensor/register", "[" + id + ", " + sc.getSensorRate() + "]");
+                        }
+                        DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 1); // microseconds -> hertz
+                        service.getSCM().registerSensorCollector(id);
+                        if(Settings.STREAMING){
+                            SensorDataUtil.openSocket(id, DeviceID.get(MainActivity.this));
                         }
                     }
-                    else {
-                        service.getSCM().clearCache(id, DeviceID.get(MainActivity.this));
-                        if(!service.getSCM().enableCollectors(id)) {
-                            Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_generel_notify2), Toast.LENGTH_LONG).show();
-                        } else {
-                            if(Settings.WEARSENSOR) {
-                                BroadcastService.getInstance().sendMessage("/sensor/register", "[" + id + ", " + sc.getSensorRate() + "]");
-                            }
-                            DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 1); // microseconds -> hertz
-                            service.getSCM().registerSensorCollector(id);
-                            if(Settings.STREAMING){
-                                SensorDataUtil.openSocket(id, DeviceID.get(MainActivity.this));
-                            }
-                        }
-                    }
-                }else{
-                    if(!this.recordFlag){
-                        Toast.makeText(getBaseContext(), SensorDataUtil.getSensorType(id) + " not supported", Toast.LENGTH_LONG).show();
-                    }
+                }
+            }else{
+                if(!this.recordFlag){
+                    Toast.makeText(getBaseContext(), SensorDataUtil.getSensorType(id) + " not supported", Toast.LENGTH_LONG).show();
                 }
             }
         }
-
-        /*if (this.recordFlag) {            //database update
-            DatabaseDelete deleteTask = new DatabaseDelete(this, true);
-            DatabaseExportSQL task = new DatabaseExportSQL(this, deleteTask);
-            task.execute();
-        }*/
 
         this.recordFlag = !this.recordFlag;
     }
@@ -1278,7 +1255,7 @@ public class MainActivity extends AppCompatActivity
                     SensorCollector sc = service.getSCM().getSensorCollectors().get(sensorID);
                     // Fall 1: Sensor läuft bereits dann removen wir ihn
                     if(chBx.isChecked()) {
-                        if(!service.getSCM().removeSensor(sensorName, sensorID)) {
+                        if(!service.getSCM().removeSensor(sensorID)) {
                             Toast.makeText(getBaseContext(), getString(R.string.sensor_collector_generel_notify1), Toast.LENGTH_LONG).show();
                         } else {
                             BroadcastService.getInstance().sendMessage("/sensor/unregister", String.valueOf(sensorID));

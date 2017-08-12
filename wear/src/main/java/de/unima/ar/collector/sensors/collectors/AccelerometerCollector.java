@@ -21,6 +21,10 @@ import de.unima.ar.collector.shared.util.DeviceID;
 public class AccelerometerCollector extends Collector
 {
     private static final int      type       = 1;
+
+    private static int   broadcastCounter    = 0;
+    private static String         record     = "";
+
     private static final String[] valueNames = new String[]{ "attr_x", "attr_y", "attr_z", "attr_time" };
 
     private boolean isRegistered = false;
@@ -29,12 +33,20 @@ public class AccelerometerCollector extends Collector
 
     private static Map<String, List<String[]>> cache = new HashMap<>();
 
+    private long startTimer = -1;
+    private long counter    = -1;
+
 
     @Override
     public void onSensorChanged(SensorEvent event)
     {
         float[] values = event.values.clone();
         long time = System.currentTimeMillis();
+
+        if(!(1 + (int) ((time - startTimer) / (this.sensorRate / 1000)) > counter)) {
+            return;
+        }
+        counter++;
 
         float x = values[0];
         float y = values[1];
@@ -53,9 +65,20 @@ public class AccelerometerCollector extends Collector
 
         String deviceID = DeviceID.get(SensorService.getInstance());
 
-        if(Settings.WEARTRANSFERDIRECT) {
-            String record = valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
-            BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+        if(Settings.STREAMING) {
+            if(broadcastCounter == Settings.STREAM_BUFFER_SIZE - 1){
+                record = record + "|" + valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
+                BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+                broadcastCounter = 0;
+            }else{
+                if(broadcastCounter!=0){
+                    record = record + "|" + valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
+                }else{
+                    record = valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
+                }
+                broadcastCounter++;
+            }
+
         } else {
             ContentValues newValues = new ContentValues();
             newValues.put(valueNames[0], x);
@@ -100,6 +123,14 @@ public class AccelerometerCollector extends Collector
     public void setRegisteredState(boolean b)
     {
         this.isRegistered = b;
+
+        if(this.isRegistered) {
+            this.startTimer = System.currentTimeMillis();
+            this.counter = 0;
+        } else {
+            this.startTimer = -1;
+            this.counter = -1;
+        }
     }
 
 
@@ -121,12 +152,7 @@ public class AccelerometerCollector extends Collector
     {
         String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.ACCELEROMETER;
 
-        if(Settings.DATABASE_DIRECT_INSERT) {
-            SQLDBController.getInstance().insert(tableName, null, newValues);
-            return;
-        }
-
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE ));
         if(clone != null) {
             Log.d("TIMOSENSOR", "INSERT ACC INTO DB");
             SQLDBController.getInstance().bulkInsert(tableName, clone);

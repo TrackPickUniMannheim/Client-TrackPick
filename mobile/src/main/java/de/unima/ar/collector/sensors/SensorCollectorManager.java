@@ -120,9 +120,9 @@ public class SensorCollectorManager
     }
 
 
-    public boolean removeSensor(String name, int type)
+    public boolean removeSensor(int type)
     {
-        boolean result = unregisterSensorCollector(name, type);
+        boolean result = unregisterSensorCollector(type);
 
         if(result) {
             disableCollectors(type);
@@ -212,7 +212,7 @@ public class SensorCollectorManager
     }
 
 
-    public boolean unregisterSensorCollector(String name, int type)
+    public boolean unregisterSensorCollector(int type)
     {
         for(SensorCollector sel : this.sensorCollectors.values()) {
             if(!(sel.isRegistered && sel.getType() == type && this.enabledCollectors.contains(sel.getType()))) {

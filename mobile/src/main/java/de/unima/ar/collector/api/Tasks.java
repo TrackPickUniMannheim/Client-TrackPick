@@ -280,80 +280,94 @@ class Tasks
         path = path.substring("/sensor/data/".length());
 
         String deviceID = path.substring(0, path.indexOf("/"));
-        //int type = Integer.valueOf(path.substring(path.indexOf("/") + 1, path.lastIndexOf("/")));
         int type = Integer.valueOf(path.substring(path.indexOf("/") + 1));
 
         String data = StringUtils.convertByteArrayToString(rawData);
-        String[] entries = StringUtils.split(data);
-        ContentValues newValues = new ContentValues();
-        for(int i = 0; i < entries.length; i += 2) {
-            newValues.put(entries[i], entries[i + 1]);
-        }
 
-        switch(type) {
-            case 1:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
-                }
-                AccelerometerSensorCollector.writeSensorData(deviceID, newValues);
-                break;
-            case 2:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    MagneticFieldSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
-                }
-                MagneticFieldSensorCollector.writeSensorData(deviceID, newValues);
-                break;
-            case 3:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    OrientationSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
-                }
-                OrientationSensorCollector.writeDBStorage(deviceID, newValues);
-                break;
-            case 4:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    GyroscopeSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
-                }
-                GyroscopeSensorCollector.writeSensorData(deviceID, newValues);
-                break;
-            case 6:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    PressureSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]) });
-                }
-                PressureSensorCollector.writeDBStorage(deviceID, newValues);
-                break;
-            case 9:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    GravitySensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
-                }
-                GravitySensorCollector.writeDBStorage(deviceID, newValues);
-                break;
-            case 10:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    LinearAccelerationSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
-                }
-                LinearAccelerationSensorCollector.writeDBStorage(deviceID, newValues);
-                break;
-            case 11:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    RotationVectorSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5]) });
-                }
-                RotationVectorSensorCollector.writeDBStorage(deviceID, newValues);
-                break;
-            case 18:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    StepDetectorSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]) });
-                }
-                StepDetectorSensorCollector.writeDBStorage(deviceID, newValues);
-                break;
-            case 19:
-                if(Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
-                    StepCounterSensorCollector.updateLivePlotter(deviceID, new float[]{ Float.valueOf(entries[1]) });
-                }
-                StepCounterSensorCollector.writeDBStorage(deviceID, newValues);
-                break;
+        if(Settings.STREAMING){
+            String[] measures = StringUtils.intoEntries(data);
+            switch(type) {
+                case 1:
+                    AccelerometerSensorCollector.writeWatchSensorData(deviceID, measures);
+                    break;
+                case 2:
+                    MagneticFieldSensorCollector.writeWatchSensorData(deviceID, measures);
+                    break;
+                case 4:
+                    GyroscopeSensorCollector.writeWatchSensorData(deviceID, measures);
+                    break;
+            }
+        }else{
+            String[] entries = StringUtils.split(data);
+            ContentValues newValues = new ContentValues();
+            for(int i = 0; i < entries.length; i += 2) {
+                newValues.put(entries[i], entries[i + 1]);
+            }
+
+            switch(type) {
+                case 1:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5])});
+                    }
+                    AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 2:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        MagneticFieldSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5])});
+                    }
+                    MagneticFieldSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 3:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        OrientationSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5])});
+                    }
+                    OrientationSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 4:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        GyroscopeSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5])});
+                    }
+                    GyroscopeSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 6:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        PressureSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1])});
+                    }
+                    PressureSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 9:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        GravitySensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5])});
+                    }
+                    GravitySensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 10:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        LinearAccelerationSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5])});
+                    }
+                    LinearAccelerationSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 11:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        RotationVectorSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1]), Float.valueOf(entries[3]), Float.valueOf(entries[5])});
+                    }
+                    RotationVectorSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 18:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        StepDetectorSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1])});
+                    }
+                    StepDetectorSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+                case 19:
+                    if (Settings.WEARTRANSFERDIRECT && Settings.LIVE_PLOTTER_ENABLED) {
+                        StepCounterSensorCollector.updateLivePlotter(deviceID, new float[]{Float.valueOf(entries[1])});
+                    }
+                    StepCounterSensorCollector.writeDBStorage(deviceID, newValues);
+                    break;
+            }
         }
     }
-
 
     static void processIncomingSensorBlob(String path, byte[] rawData)
     {

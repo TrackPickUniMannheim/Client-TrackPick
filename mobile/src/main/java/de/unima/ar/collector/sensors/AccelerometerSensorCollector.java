@@ -24,6 +24,7 @@ import de.unima.ar.collector.shared.database.SQLTableName;
 import de.unima.ar.collector.shared.util.DeviceID;
 import de.unima.ar.collector.util.DBUtils;
 import de.unima.ar.collector.util.PlotConfiguration;
+import de.unima.ar.collector.util.StringUtils;
 
 /**
  * @author Fabian Kramm, Timo Sztyler, Nancy Kunath
@@ -89,7 +90,6 @@ public class AccelerometerSensorCollector extends SensorCollector
         }else{
             AccelerometerSensorCollector.writeDBStorage(deviceID, newValues);
         }
-
         AccelerometerSensorCollector.updateLivePlotter(deviceID, new float[]{ x, y, z });
     }
 
@@ -154,7 +154,8 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void writeSensorData(String deviceID, ContentValues newValues)
     {
-        if(Settings.DATABASE_DIRECT_INSERT) {
+        //if(Settings.DATABASE_DIRECT_INSERT) {
+        if(false){
             if(mTcpClient!=null && mTcpClient.getMRun() != false) {
                 JSONObject ObJson = new JSONObject();
                 try {
@@ -178,15 +179,15 @@ public class AccelerometerSensorCollector extends SensorCollector
             }
             return;
         } else {
-            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 2));
+            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.STREAM_BUFFER_SIZE));
             if(clone != null) {
                 JSONObject ObJson = new JSONObject();
                 try {
                     ObJson.put("deviceID",deviceID);
                     ObJson.put("sensorType","accelerometer");
                     JSONArray array = new JSONArray();
-                    JSONObject values = new JSONObject();
-                    for (int i=0; i<clone.size(); i++) {
+                    for (int i=1; i<clone.size(); i++) {
+                        JSONObject values = new JSONObject();
                         values.put("timeStamp", clone.get(i)[0].toString());
                         values.put("x", clone.get(i)[1].toString());
                         values.put("y", clone.get(i)[2].toString());
@@ -202,6 +203,32 @@ public class AccelerometerSensorCollector extends SensorCollector
                     new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
+        }
+    }
+
+    public static void writeWatchSensorData(String deviceID, String[] measures)
+    {
+        JSONObject ObJson = new JSONObject();
+        try {
+            ObJson.put("deviceID",deviceID);
+            ObJson.put("sensorType","accelerometer");
+            JSONArray array = new JSONArray();
+            for(int i=0; i<measures.length; i++) {
+                String[] entries = StringUtils.split(measures[i]);
+                JSONObject values = new JSONObject();
+                values.put("timeStamp", entries[7].toString());
+                values.put("x", entries[1].toString());
+                values.put("y", entries[3].toString());
+                values.put("z", entries[5].toString());
+                array.put(values);
+            }
+            ObJson.put("data",array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+            currentJson = ObJson.toString();
+            new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -221,7 +248,7 @@ public class AccelerometerSensorCollector extends SensorCollector
             return;
         }
 
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
         if(clone != null) {
             SQLDBController.getInstance().bulkInsert(tableName, clone);
         }

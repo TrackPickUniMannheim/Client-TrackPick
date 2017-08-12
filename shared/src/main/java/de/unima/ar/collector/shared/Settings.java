@@ -9,8 +9,9 @@ public class Settings
     public static long    MICRO_DEFAULT_FREQUENCY  = 20L; // Milliseconds 20l = 50hertz
     public static boolean ACCLOWPASS               = false;
 
-    public static boolean DATABASE_DIRECT_INSERT = true;
-    public static int     DATABASE_CACHE_SIZE    = 10;   // number of entries
+    public static boolean DATABASE_DIRECT_INSERT = false;
+    public static int     DATABASE_CACHE_SIZE    = 100;   // number of entries
+    public static int     STREAM_BUFFER_SIZE     = 100;
     public static String  DATABASE_DELIMITER     = "-#~o~#-";
 
     public static boolean STREAMING              = true;

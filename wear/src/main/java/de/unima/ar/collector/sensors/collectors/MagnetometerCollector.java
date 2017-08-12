@@ -3,6 +3,7 @@ package de.unima.ar.collector.sensors.collectors;
 import android.content.ContentValues;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,9 @@ public class MagnetometerCollector extends Collector
     private static final int      type       = 2;
     private static final String[] valueNames = new String[]{ "attr_x", "attr_y", "attr_z", "attr_time" };
 
+    private static int   broadcastCounter    = 0;
+    private static String         record     = "";
+
     private boolean isRegistered = false;
     private int     sensorRate   = 0;
 
@@ -35,9 +39,20 @@ public class MagnetometerCollector extends Collector
 
         String deviceID = DeviceID.get(SensorService.getInstance());
 
-        if(Settings.WEARTRANSFERDIRECT) {
-            String record = valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
-            BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+        if(Settings.STREAMING) {
+            if(broadcastCounter == Settings.STREAM_BUFFER_SIZE - 1){
+                record = record + "|" + valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
+                BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+                broadcastCounter = 0;
+            }else{
+                if(broadcastCounter!=0){
+                    record = record + "|" + valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
+                }else{
+                    record = valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
+                }
+                broadcastCounter++;
+            }
+
         } else {
             ContentValues newValues = new ContentValues();
             newValues.put(valueNames[0], values[0]);
@@ -103,12 +118,7 @@ public class MagnetometerCollector extends Collector
     {
         String tableName = SQLTableName.PREFIX + deviceID + SQLTableName.MAGNETIC;
 
-        if(Settings.DATABASE_DIRECT_INSERT) {
-            SQLDBController.getInstance().insert(tableName, null, newValues);
-            return;
-        }
-
-        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE + type * 200));
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.DATABASE_CACHE_SIZE));
         if(clone != null) {
             SQLDBController.getInstance().bulkInsert(tableName, clone);
         }
@@ -117,6 +127,11 @@ public class MagnetometerCollector extends Collector
 
     public static void flushDBCache()
     {
-        DBUtils.flushCache(SQLTableName.MAGNETIC, cache);
+        if(cache.keySet().size() != 0) {
+            Log.d("TIMOSENSOR", "FLUSH GYRO INTO DB" + cache.values().iterator().next().size());
+        } else {
+            Log.d("TIMOSENSOR", "FLUSH GYRO INTO DB - CACHE EMPTY");
+        }
+        DBUtils.flushCache(SQLTableName.GYROSCOPE, cache);
     }
 }

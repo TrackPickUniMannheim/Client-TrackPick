@@ -119,7 +119,7 @@ public class SettingActivity extends PreferenceActivity implements SharedPrefere
                 break;
             case "server_streaming":
                 Settings.STREAMING = sharedPreferences.getBoolean(key, true);
-                //TODO: disable database setting
+                BroadcastService.getInstance().sendMessage("/settings", "[STREAMING, " + sharedPreferences.getBoolean(key, true) + "]");
                 break;
             case "server_ip":
                 Settings.SERVER_IP = sharedPreferences.getString(key,"10.0.2.2");
