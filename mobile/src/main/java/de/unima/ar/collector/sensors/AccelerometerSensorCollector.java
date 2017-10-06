@@ -1,9 +1,8 @@
 package de.unima.ar.collector.sensors;
 
 import android.content.ContentValues;
-import android.os.AsyncTask;
 import android.hardware.Sensor;
-import android.util.Log;
+import android.os.AsyncTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.unima.ar.collector.TCPClient;
 import de.unima.ar.collector.SensorDataCollectorService;
+import de.unima.ar.collector.TCPClient;
 import de.unima.ar.collector.controller.SQLDBController;
 import de.unima.ar.collector.database.DatabaseHelper;
 import de.unima.ar.collector.extended.Plotter;

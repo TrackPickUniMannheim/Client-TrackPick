@@ -2,9 +2,7 @@ package de.unima.ar.collector.sensors;
 
 import android.content.ContentValues;
 import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;

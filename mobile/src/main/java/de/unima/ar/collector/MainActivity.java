@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void recordSimultaneously() {
+    private void recordSimultaneously() {
         SensorDataCollectorService service = SensorDataCollectorService.getInstance();
 
 
@@ -1267,7 +1267,6 @@ public class MainActivity extends AppCompatActivity
                                 @Override
                                 public void run()
                                 {
-                                    //Utils.makeToast2(MainActivity.this, R.string.sensor_cache_to_database, Toast.LENGTH_LONG);
                                     Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
 
                                     if(Settings.STREAMING){
