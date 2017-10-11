@@ -97,6 +97,16 @@ public class GyroscopeCollector extends Collector
     public void setRegisteredState(boolean b)
     {
         this.isRegistered = b;
+
+        if(this.isRegistered) {
+            this.broadcastCounter = 0;
+            this.record = "";
+        } else {
+            String deviceID = DeviceID.get(SensorService.getInstance());
+            this.broadcastCounter = 0;
+            BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+            this.record = "";
+        }
     }
 
 

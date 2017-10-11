@@ -127,7 +127,13 @@ public class AccelerometerCollector extends Collector
         if(this.isRegistered) {
             this.startTimer = System.currentTimeMillis();
             this.counter = 0;
+            this.broadcastCounter = 0;
+            this.record = "";
         } else {
+            String deviceID = DeviceID.get(SensorService.getInstance());
+            this.broadcastCounter = 0;
+            BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
+            this.record = "";
             this.startTimer = -1;
             this.counter = -1;
         }

@@ -22,6 +22,7 @@ import android.hardware.Sensor;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -72,6 +73,7 @@ import de.unima.ar.collector.controller.SQLDBController;
 import de.unima.ar.collector.database.DatabaseHelper;
 import de.unima.ar.collector.extended.Plotter;
 import de.unima.ar.collector.extended.SensorSelfTest;
+import de.unima.ar.collector.sensors.AccelerometerSensorCollector;
 import de.unima.ar.collector.sensors.CustomCollector;
 import de.unima.ar.collector.sensors.GPSCollector;
 import de.unima.ar.collector.sensors.SensorCollector;
@@ -304,7 +306,7 @@ public class MainActivity extends AppCompatActivity
         SensorDataCollectorService service = SensorDataCollectorService.getInstance();
 
 
-        int[] sensors = new int[]{
+        final int[] sensors = new int[]{
                 SensorDataUtil.getSensorTypeInt("TYPE_ACCELEROMETER"),
                 SensorDataUtil.getSensorTypeInt("TYPE_GYROSCOPE"),
                 SensorDataUtil.getSensorTypeInt("TYPE_MAGNETIC_FIELD")
@@ -331,23 +333,9 @@ public class MainActivity extends AppCompatActivity
                             BroadcastService.getInstance().sendMessage("/sensor/unregister", String.valueOf(id));
                         }
 
+                        SensorDataUtil.streamCache(id,DeviceID.get(MainActivity.this));
+
                         DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 0); // microseconds -> hertz
-
-                        new Thread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
-
-                                if(Settings.STREAMING){
-                                    SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
-                                }else{
-                                    SensorDataUtil.flushSensorDataCache(id, null);
-                                }
-
-                            }
-                        }).start();
 
                     }
                 }
@@ -371,6 +359,32 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(getBaseContext(), SensorDataUtil.getSensorType(id) + " not supported", Toast.LENGTH_LONG).show();
                 }
             }
+        }
+
+        if(this.recordFlag){
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    for (final int id: sensors) {
+                        new Thread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
+
+                                if(Settings.STREAMING){
+                                    SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
+                                }else{
+                                    SensorDataUtil.flushSensorDataCache(id, null);
+                                }
+
+                            }
+                        }).start();
+                    }
+                }
+            }, 2000);
+
         }
 
         this.recordFlag = !this.recordFlag;

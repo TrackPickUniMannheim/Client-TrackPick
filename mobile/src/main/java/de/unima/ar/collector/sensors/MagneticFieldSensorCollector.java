@@ -3,6 +3,7 @@ package de.unima.ar.collector.sensors;
 import android.content.ContentValues;
 import android.hardware.Sensor;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -239,6 +240,37 @@ public class MagneticFieldSensorCollector extends SensorCollector
     public static void flushDBCache(String deviceID)
     {
         DBUtils.flushCache(SQLTableName.MAGNETIC, cache, deviceID);
+    }
+
+    public static void streamCache(String deviceID){
+        List<String[]> buffer = cache.get(deviceID);
+
+        Log.i("Cache MagneticField",Integer.toString(buffer.size()));
+        if(buffer.size() <= 1) {
+            return;
+        }
+
+        JSONObject ObJson = new JSONObject();
+        try {
+            ObJson.put("deviceID",deviceID);
+            ObJson.put("sensorType","magneticField");
+            JSONArray array = new JSONArray();
+            for (int i=1; i<buffer.size(); i++) {
+                JSONObject values = new JSONObject();
+                values.put("timeStamp", buffer.get(i)[0].toString());
+                values.put("x", buffer.get(i)[1].toString());
+                values.put("y", buffer.get(i)[2].toString());
+                values.put("z", buffer.get(i)[3].toString());
+                array.put(values);
+            }
+            ObJson.put("data",array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+            currentJson = ObJson.toString();
+            new MagneticFieldSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
     }
 
     public void clearCache(String id) {

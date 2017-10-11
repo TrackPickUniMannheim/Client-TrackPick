@@ -315,6 +315,18 @@ public class SensorDataUtil
         }
     }
 
+    public static void streamCache(final int type, final String deviceID) {
+        if(type == 1 || type == 0) {
+            AccelerometerSensorCollector.streamCache(deviceID);
+        }
+        if(type == 2 || type == 0) {
+            MagneticFieldSensorCollector.streamCache(deviceID);
+        }
+        if(type == 4 || type == 0) {
+            GyroscopeSensorCollector.streamCache(deviceID);
+        }
+    }
+
     public static void closeSocket(final int type, final String deviceID){
         new Thread(new Runnable()
         {

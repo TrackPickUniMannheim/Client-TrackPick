@@ -99,7 +99,6 @@ public class DBUtils
         }
     }
 
-
     public static void updateSensorStatus(int type, int frequency, int enabled)
     {
         ContentValues values = new ContentValues();

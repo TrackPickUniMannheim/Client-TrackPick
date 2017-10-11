@@ -242,6 +242,37 @@ public class GyroscopeSensorCollector extends SensorCollector
         DBUtils.flushCache(SQLTableName.GYROSCOPE, cache, deviceID);
     }
 
+    public static void streamCache(String deviceID){
+        List<String[]> buffer = cache.get(deviceID);
+
+        Log.i("Cache Gyroscope",Integer.toString(buffer.size()));
+        if(buffer.size() <= 1) {
+            return;
+        }
+
+        JSONObject ObJson = new JSONObject();
+        try {
+            ObJson.put("deviceID",deviceID);
+            ObJson.put("sensorType","gyroscope");
+            JSONArray array = new JSONArray();
+            for (int i=1; i<buffer.size(); i++) {
+                JSONObject values = new JSONObject();
+                values.put("timeStamp", buffer.get(i)[0].toString());
+                values.put("x", buffer.get(i)[1].toString());
+                values.put("y", buffer.get(i)[2].toString());
+                values.put("z", buffer.get(i)[3].toString());
+                array.put(values);
+            }
+            ObJson.put("data",array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+            currentJson = ObJson.toString();
+            new GyroscopeSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+    }
+
     public void clearCache(String id) {
         cache.remove(id);
     }

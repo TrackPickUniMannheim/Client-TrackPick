@@ -227,7 +227,7 @@
     <string name="analyze_analyzelive_loading9">Vorgang abgeschlossen</string>
 
     <!-- Export / About -->
-    <string name="option_export_title">Datenbank</string>
+    <string name="option_export_title">Daten</string>
     <string name="option_export_delete">Datenbank löschen</string>
     <string name="option_export_delete_desc">Löscht alle Aufzeichnungen und Einstellungen</string>
     <string name="option_export_delete_message">Sind Sie wirklich sicher das Sie die Datenbank vollständig löschen möchten? Bitte bestätigen Sie diese Aktion.</string>
