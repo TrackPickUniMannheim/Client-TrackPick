@@ -10,8 +10,8 @@ public class Settings
     public static boolean ACCLOWPASS               = false;
 
     public static boolean DATABASE_DIRECT_INSERT = false;
-    public static int     DATABASE_CACHE_SIZE    = 100;   // number of entries
-    public static int     STREAM_BUFFER_SIZE     = 100;
+    public static int     DATABASE_CACHE_SIZE    = 50;   // number of entries
+    public static int     STREAM_BUFFER_SIZE     = 50;
     public static String  DATABASE_DELIMITER     = "-#~o~#-";
 
     public static boolean STREAMING              = true;

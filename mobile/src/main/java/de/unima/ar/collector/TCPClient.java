@@ -10,13 +10,11 @@ import de.unima.ar.collector.shared.Settings;
 
 public class TCPClient {
 
-    public static String SERVER_IP = Settings.SERVER_IP;
-    public static int SERVER_PORT = Settings.SERVER_PORT;
     private String mServerMessage;
     private boolean mRun = false;
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
-    //private static TCPClient obj = new TCPClient();
+    //private static TCPClient tcpClient = new TCPClient();
     private static Integer counter = 0;
 
     public TCPClient() {
@@ -24,7 +22,7 @@ public class TCPClient {
     }
 
     /*public static TCPClient getInstance(){
-        return obj;
+        return tcpClient;
     }
 
     public void register(){
@@ -71,17 +69,15 @@ public class TCPClient {
     }
 
     public void run() {
-        SERVER_IP = Settings.SERVER_IP;
-        SERVER_PORT = Settings.SERVER_PORT;
 
         mRun = true;
 
         try {
-            InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+            InetAddress serverAddr = InetAddress.getByName(Settings.SERVER_IP);
             Log.i("TCP Client", "C: Connecting..." + serverAddr.toString());
 
             //create a socket to make the connection with the server
-            Socket socket = new Socket(serverAddr, SERVER_PORT);
+            Socket socket = new Socket(serverAddr, Settings.SERVER_PORT);
 
             Log.i("TCP Client",socket.toString());
 
