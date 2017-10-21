@@ -219,9 +219,13 @@ public class GyroscopeSensorCollector extends SensorCollector
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(mTcpClientWatch!=null && mTcpClientWatch.getMRun() != false) {
+        /*if(mTcpClientWatch!=null && mTcpClientWatch.getMRun() != false) {
             currentJsonWatch = ObJson.toString();
             new GyroscopeSensorCollector.SendTaskWatch().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }*/
+        if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+            currentJson = ObJson.toString();
+            new GyroscopeSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -285,20 +289,20 @@ public class GyroscopeSensorCollector extends SensorCollector
         GyroscopeSensorCollector.ConnectTask task = new GyroscopeSensorCollector.ConnectTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        if(Settings.WEARSENSOR) {
+        /*if(Settings.WEARSENSOR) {
             GyroscopeSensorCollector.ConnectTaskWatch taskWatch = new GyroscopeSensorCollector.ConnectTaskWatch();
             taskWatch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+        }*/
     }
 
     public static void closeSocket(String deviceID){
         // disconnect to the server
-        mTcpClient.stopClient();
+        /*mTcpClient.stopClient();
 
-        if(Settings.WEARSENSOR) {
+        if(Settings.WEARSENSOR){
             mTcpClientWatch.stopClient();
-        }
-        //mTcpClient.deregister();
+        }*/
+        mTcpClient.deregister();
     }
 
     private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
@@ -306,11 +310,11 @@ public class GyroscopeSensorCollector extends SensorCollector
         @Override
         protected TCPClient doInBackground(String... message) {
 
-            mTcpClient = new TCPClient();
-            mTcpClient.run();
+            //mTcpClient = new TCPClient();
+            //mTcpClient.run();
 
-            //mTcpClient = TCPClient.getInstance();
-            //mTcpClient.register();
+            mTcpClient = TCPClient.getInstance();
+            mTcpClient.register();
 
             return null;
         }
@@ -329,7 +333,7 @@ public class GyroscopeSensorCollector extends SensorCollector
 
     }
 
-    private static class ConnectTaskWatch extends AsyncTask<String,String,TCPClient> {
+    /*private static class ConnectTaskWatch extends AsyncTask<String,String,TCPClient> {
 
         @Override
         protected TCPClient doInBackground(String... message) {
@@ -355,5 +359,5 @@ public class GyroscopeSensorCollector extends SensorCollector
             return null;
         }
 
-    }
+    }*/
 }
