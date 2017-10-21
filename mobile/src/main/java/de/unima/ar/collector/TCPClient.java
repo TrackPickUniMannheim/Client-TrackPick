@@ -14,14 +14,14 @@ public class TCPClient {
     private boolean mRun = false;
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
-    private static TCPClient tcpClient = new TCPClient();
+    //private static TCPClient tcpClient = new TCPClient();
     private static Integer counter = 0;
 
-    /*public TCPClient() {
+    public TCPClient() {
 
-    }*/
+    }
 
-    public static TCPClient getInstance(){
+    /*public static TCPClient getInstance(){
         return tcpClient;
     }
 
@@ -37,7 +37,7 @@ public class TCPClient {
         if(counter == 0){
             stopClient();
         }
-    }
+    }*/
 
     public boolean getMRun(){
         return mRun;
@@ -52,9 +52,9 @@ public class TCPClient {
 
     public void stopClient() {
         TCPClient.counter--;
-        //if(counter == 0){
+        if(counter == 0){
             sendMessage("Disconnect");
-        //}
+        }
 
         mRun = false;
 
