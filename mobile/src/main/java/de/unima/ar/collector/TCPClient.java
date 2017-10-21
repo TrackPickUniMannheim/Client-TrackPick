@@ -30,6 +30,7 @@ public class TCPClient {
         if(counter == 1){
             run();
         }
+        Log.i("Register", Integer.toString(counter));
     }
 
     public void deregister(){
@@ -37,6 +38,7 @@ public class TCPClient {
         if(counter == 0){
             stopClient();
         }
+        Log.i("Deregister", Integer.toString(counter));
     }
 
     public boolean getMRun(){
@@ -51,10 +53,13 @@ public class TCPClient {
     }
 
     public void stopClient() {
-        TCPClient.counter--;
+        //TCPClient.counter--;
         //if(counter == 0){
-            sendMessage("Disconnect");
+        //    sendMessage("Disconnect");
         //}
+
+        TCPClient.counter = 0;
+        sendMessage("Disconnect");
 
         mRun = false;
 
@@ -90,7 +95,7 @@ public class TCPClient {
                     sendMessage("Connect");
                 }
 
-                TCPClient.counter++;
+                //TCPClient.counter++;
 
                 //listens for messages from server
                 while (mRun) {
