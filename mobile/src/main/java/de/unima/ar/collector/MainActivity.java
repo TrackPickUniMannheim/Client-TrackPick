@@ -73,6 +73,7 @@ import de.unima.ar.collector.controller.SQLDBController;
 import de.unima.ar.collector.database.DatabaseHelper;
 import de.unima.ar.collector.extended.Plotter;
 import de.unima.ar.collector.extended.SensorSelfTest;
+import de.unima.ar.collector.sensors.AccelerometerSensorCollector;
 import de.unima.ar.collector.sensors.CustomCollector;
 import de.unima.ar.collector.sensors.GPSCollector;
 import de.unima.ar.collector.sensors.SensorCollector;

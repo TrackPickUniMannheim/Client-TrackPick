@@ -41,9 +41,6 @@ public class AccelerometerSensorCollector extends SensorCollector
     private static TCPClient mTcpClient;
     public static String currentJson;
 
-    private static TCPClient mTcpClientWatch;
-    public static String currentJsonWatch;
-
 
     public AccelerometerSensorCollector(Sensor sensor)
     {
@@ -230,9 +227,9 @@ public class AccelerometerSensorCollector extends SensorCollector
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(mTcpClientWatch!=null && mTcpClientWatch.getMRun() != false) {
-            currentJsonWatch = ObJson.toString();
-            new AccelerometerSensorCollector.SendTaskWatch().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if(mTcpClient!=null && mTcpClient.getMRun() != false) {
+            currentJson = ObJson.toString();
+            new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -302,20 +299,11 @@ public class AccelerometerSensorCollector extends SensorCollector
         // connect to the server
         ConnectTask task = new ConnectTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-        if(Settings.WEARSENSOR) {
-            ConnectTaskWatch taskWatch = new ConnectTaskWatch();
-            taskWatch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
     }
 
     public static void closeSocket(String deviceID){
         // disconnect from the server
         mTcpClient.stopClient();
-
-        if (Settings.WEARSENSOR) {
-            mTcpClientWatch.stopClient();
-        }
         //mTcpClient.deregister();
     }
 
@@ -341,34 +329,6 @@ public class AccelerometerSensorCollector extends SensorCollector
         protected TCPClient doInBackground(String... message) {
 
             mTcpClient.sendMessage(AccelerometerSensorCollector.currentJson);
-
-            return null;
-        }
-
-    }
-
-    private static class ConnectTaskWatch extends AsyncTask<String,String,TCPClient> {
-
-        @Override
-        protected TCPClient doInBackground(String... message) {
-
-            mTcpClientWatch = new TCPClient();
-            mTcpClientWatch.run();
-
-            //mTcpClient = TCPClient.getInstance();
-            //mTcpClient.register();
-
-            return null;
-        }
-
-    }
-
-    private static class SendTaskWatch extends AsyncTask<String,String,TCPClient> {
-
-        @Override
-        protected TCPClient doInBackground(String... message) {
-
-            mTcpClientWatch.sendMessage(AccelerometerSensorCollector.currentJsonWatch);
 
             return null;
         }
