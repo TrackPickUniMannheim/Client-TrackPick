@@ -1,8 +1,14 @@
 package de.unima.ar.collector; /**
  * Created by Nancy Kunath on 29.03.2017.
  */
+
 import android.util.Log;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -14,30 +20,9 @@ public class TCPClient {
     private boolean mRun = false;
     private PrintWriter mBufferOut;
     private BufferedReader mBufferIn;
-    //private static TCPClient tcpClient = new TCPClient();
     private static Integer counter = 0;
 
-    public TCPClient() {
-
-    }
-
-    /*public static TCPClient getInstance(){
-        return tcpClient;
-    }
-
-    public void register(){
-        counter++;
-        if(counter == 1){
-            run();
-        }
-    }
-
-    public void deregister(){
-        counter--;
-        if(counter == 0){
-            stopClient();
-        }
-    }*/
+    public TCPClient() {}
 
     public boolean getMRun(){
         return mRun;

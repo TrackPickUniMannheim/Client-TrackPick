@@ -40,6 +40,7 @@ public class MagnetometerCollector extends Collector
         String deviceID = DeviceID.get(SensorService.getInstance());
 
         if(Settings.STREAMING) {
+            //Prepare and send Sensordata via BroadCast using buffering
             if(broadcastCounter == Settings.STREAM_BUFFER_SIZE - 1){
                 record = record + "|" + valueNames[0] + ";" + values[0] + ";" + valueNames[1] + ";" + values[1] + ";" + valueNames[2] + ";" + values[2] + ";" + valueNames[3] + ";" + time;
                 BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
@@ -54,6 +55,7 @@ public class MagnetometerCollector extends Collector
             }
 
         } else {
+            //Store Sensordata to Database
             ContentValues newValues = new ContentValues();
             newValues.put(valueNames[0], values[0]);
             newValues.put(valueNames[1], values[1]);

@@ -154,56 +154,32 @@ public class AccelerometerSensorCollector extends SensorCollector
 
     public static void writeSensorData(String deviceID, ContentValues newValues)
     {
-        //if(Settings.DATABASE_DIRECT_INSERT) {
-        if(false){
-            if(mTcpClient!=null && mTcpClient.getMRun() != false) {
-                JSONObject ObJson = new JSONObject();
-                try {
-                    ObJson.put("deviceID",deviceID);
-                    ObJson.put("sensorType","accelerometer");
-                    JSONArray array = new JSONArray();
-                    JSONObject values = new JSONObject();
-                    values.put("timeStamp", newValues.getAsString("attr_time"));
-                    values.put("x", newValues.getAsString("attr_x"));
-                    values.put("y", newValues.getAsString("attr_y"));
-                    values.put("z", newValues.getAsString("attr_z"));
-                    array.put(values);
-                    ObJson.put("data",array);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
+        List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.STREAM_BUFFER_SIZE));
+        if(clone != null) {
+            JSONObject ObJson = new JSONObject();
+            try {
+                ObJson.put("deviceID",deviceID);
+                ObJson.put("sensorType","accelerometer");
+                JSONArray array = new JSONArray();
+                for (int i=1; i<clone.size(); i++) {
+                    JSONObject values = new JSONObject();
+                    values.put("timeStamp", clone.get(i)[0].toString());
+                    values.put("x", clone.get(i)[1].toString());
+                    values.put("y", clone.get(i)[2].toString());
+                    values.put("z", clone.get(i)[3].toString());
+                    array.put(values);
+                }
+                ObJson.put("data",array);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if(mTcpClient!=null && mTcpClient.getMRun() != false) {
                 currentJson = ObJson.toString();
                 new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-            }
-            return;
-        } else {
-            List<String[]> clone = DBUtils.manageCache(deviceID, cache, newValues, (Settings.STREAM_BUFFER_SIZE));
-            if(clone != null) {
-                JSONObject ObJson = new JSONObject();
-                try {
-                    ObJson.put("deviceID",deviceID);
-                    ObJson.put("sensorType","accelerometer");
-                    JSONArray array = new JSONArray();
-                    for (int i=1; i<clone.size(); i++) {
-                        JSONObject values = new JSONObject();
-                        values.put("timeStamp", clone.get(i)[0].toString());
-                        values.put("x", clone.get(i)[1].toString());
-                        values.put("y", clone.get(i)[2].toString());
-                        values.put("z", clone.get(i)[3].toString());
-                        array.put(values);
-                    }
-                    ObJson.put("data",array);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if(mTcpClient!=null && mTcpClient.getMRun() != false) {
-                    currentJson = ObJson.toString();
-                    new AccelerometerSensorCollector.SendTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
             }
         }
+
     }
 
     public static void writeWatchSensorData(String deviceID, String[] measures)
@@ -295,36 +271,31 @@ public class AccelerometerSensorCollector extends SensorCollector
         cache.remove(id);
     }
 
-    public static void openSocket(String deviceID){
+    public static void openSocket(){
         // connect to the server
         ConnectTask task = new ConnectTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public static void closeSocket(String deviceID){
-        // disconnect from the server
+    public static void closeSocket(){
+        // disconnect from server
         mTcpClient.stopClient();
-        //mTcpClient.deregister();
     }
 
+    //asynchronous task for connecting to server
     private static class ConnectTask extends AsyncTask<String,String,TCPClient> {
-
         @Override
         protected TCPClient doInBackground(String... message) {
 
             mTcpClient = new TCPClient();
             mTcpClient.run();
 
-            //mTcpClient = TCPClient.getInstance();
-            //mTcpClient.register();
-
             return null;
         }
-
     }
 
+    //asynchronous task for sending a message to the server
     private static class SendTask extends AsyncTask<String,String,TCPClient> {
-
         @Override
         protected TCPClient doInBackground(String... message) {
 
@@ -332,6 +303,5 @@ public class AccelerometerSensorCollector extends SensorCollector
 
             return null;
         }
-
     }
 }

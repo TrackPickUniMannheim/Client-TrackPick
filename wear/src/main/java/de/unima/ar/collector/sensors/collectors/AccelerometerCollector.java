@@ -66,6 +66,7 @@ public class AccelerometerCollector extends Collector
         String deviceID = DeviceID.get(SensorService.getInstance());
 
         if(Settings.STREAMING) {
+            //Prepare and send Sensordata via BroadCast using buffering
             if(broadcastCounter == Settings.STREAM_BUFFER_SIZE - 1){
                 record = record + "|" + valueNames[0] + ";" + x + ";" + valueNames[1] + ";" + y + ";" + valueNames[2] + ";" + z + ";" + valueNames[3] + ";" + time;
                 BroadcastService.getInstance().sendMessage("/sensor/data/" + deviceID + "/" + type, record);
@@ -80,6 +81,7 @@ public class AccelerometerCollector extends Collector
             }
 
         } else {
+            //Store Sensordata to Database
             ContentValues newValues = new ContentValues();
             newValues.put(valueNames[0], x);
             newValues.put(valueNames[1], y);

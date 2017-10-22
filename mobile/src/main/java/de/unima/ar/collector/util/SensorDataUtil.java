@@ -327,41 +327,41 @@ public class SensorDataUtil
         }
     }
 
-    public static void closeSocket(final int type, final String deviceID){
+    public static void closeSocket(final int type){
         new Thread(new Runnable()
         {
             @Override
             public void run()
             {
                 if(type == 1 || type == 0) {
-                    AccelerometerSensorCollector.closeSocket(deviceID);
+                    AccelerometerSensorCollector.closeSocket();
                 }
                 if(type == 2 || type == 0) {
-                    MagneticFieldSensorCollector.closeSocket(deviceID);
+                    MagneticFieldSensorCollector.closeSocket();
                 }
                 if(type == 4 || type == 0) {
-                    GyroscopeSensorCollector.closeSocket(deviceID);
+                    GyroscopeSensorCollector.closeSocket();
                 }
             }
         }).start();
     }
 
-    public static void openSocket(final int type, final String deviceID){
+    public static void openSocket(final int type){
         new Thread(new Runnable()
         {
             @Override
             public void run()
             {
                 if(type == 1 || type == 0) {
-                    AccelerometerSensorCollector.openSocket(deviceID);
+                    AccelerometerSensorCollector.openSocket();
                     Log.i("SensorDataUtil", "Accelerometer - openSocket");
                 }
                 if(type == 2 || type == 0) {
-                    MagneticFieldSensorCollector.openSocket(deviceID);
+                    MagneticFieldSensorCollector.openSocket();
                     Log.i("SensorDataUtil", "MagneticField - openSocket");
                 }
                 if(type == 4 || type == 0) {
-                    GyroscopeSensorCollector.openSocket(deviceID);
+                    GyroscopeSensorCollector.openSocket();
                     Log.i("SensorDataUtil", "Gyroscope - openSocket");
                 }
             }

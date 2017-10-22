@@ -73,7 +73,6 @@ import de.unima.ar.collector.controller.SQLDBController;
 import de.unima.ar.collector.database.DatabaseHelper;
 import de.unima.ar.collector.extended.Plotter;
 import de.unima.ar.collector.extended.SensorSelfTest;
-import de.unima.ar.collector.sensors.AccelerometerSensorCollector;
 import de.unima.ar.collector.sensors.CustomCollector;
 import de.unima.ar.collector.sensors.GPSCollector;
 import de.unima.ar.collector.sensors.SensorCollector;
@@ -350,7 +349,7 @@ public class MainActivity extends AppCompatActivity
                         DBUtils.updateSensorStatus(id, (1000 * 1000) / sc.getSensorRate(), 1); // microseconds -> hertz
                         service.getSCM().registerSensorCollector(id);
                         if(Settings.STREAMING){
-                            SensorDataUtil.openSocket(id, DeviceID.get(MainActivity.this));
+                            SensorDataUtil.openSocket(id);
                         }
                     }
                 }
@@ -374,7 +373,7 @@ public class MainActivity extends AppCompatActivity
                                 Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
 
                                 if(Settings.STREAMING){
-                                    SensorDataUtil.closeSocket(id, DeviceID.get(MainActivity.this));
+                                    SensorDataUtil.closeSocket(id);
                                 }else{
                                     SensorDataUtil.flushSensorDataCache(id, null);
                                 }
@@ -1284,7 +1283,7 @@ public class MainActivity extends AppCompatActivity
                                     Utils.makeToast2(MainActivity.this, R.string.sensor_disabled, Toast.LENGTH_LONG);
 
                                     if(Settings.STREAMING){
-                                        SensorDataUtil.closeSocket(sensorID, deviceID);
+                                        SensorDataUtil.closeSocket(sensorID);
                                     }else{
                                         SensorDataUtil.flushSensorDataCache(sensorID, null);
                                     }
@@ -1302,7 +1301,7 @@ public class MainActivity extends AppCompatActivity
                             DBUtils.updateSensorStatus(sensorID, (1000 * 1000) / sc.getSensorRate(), 1); // microseconds -> hertz
                             service.getSCM().registerSensorCollector(sensorID);
                             if(Settings.STREAMING){
-                                SensorDataUtil.openSocket(sensorID, deviceID);
+                                SensorDataUtil.openSocket(sensorID);
                             }
                             chBx.setChecked(true);
                         }
